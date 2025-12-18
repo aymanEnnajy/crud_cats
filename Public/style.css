@@ -535,3 +535,15 @@ button {
         display: inline-block;
     }
 }
+
+/* Ajoutez ceci dans le style de chaque page */
+.navbar{
+    margin-top: -20px !important;
+    width: 100vw !important;
+    margin-left: -21px;
+}
+@media (max-width:767px) {
+    .navbar{
+        margin-left: 0px;
+    }
+}

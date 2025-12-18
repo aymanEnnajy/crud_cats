@@ -245,7 +245,7 @@
 
         .password-toggle {
             position: absolute;
-            right: 15px;
+            right: 45px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -271,6 +271,9 @@
     </style>
 </head>
 <body>
+<!-- Ajoutez cette div pour contenir la navbar -->
+<div id="navbar-root"></div>
+
     <div class="login-container">
         <div class="login-card">
             <div class="logo">
@@ -323,6 +326,8 @@
     </div>
 
     <script src="auth.js"></script>
+    <script src="navbar.js"></script>
+
     <!-- À la fin du body, après auth.js -->
 <script src="auth-check.js"></script>
 </body>

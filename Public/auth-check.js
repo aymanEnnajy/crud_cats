@@ -25,65 +25,7 @@
   }
   
   // Afficher les infos utilisateur si connecté
-  if (user && document.body) {
-    // Créer un badge utilisateur
-    const existingBadge = document.getElementById('userBadge');
-    if (existingBadge) existingBadge.remove();
-    
-    const userBadge = document.createElement('div');
-    userBadge.id = 'userBadge';
-    userBadge.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #3b82f6;
-      color: white;
-      padding: 8px 15px;
-      border-radius: 20px;
-      font-size: 14px;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    `;
-    
-    userBadge.innerHTML = `
-      <i class="fas fa-user-circle" style="font-size: 16px;"></i>
-      <span>${user.username}</span>
-      <button onclick="logout()" style="
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        margin-left: 10px;
-        padding: 4px;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.3s ease;
-      ">
-        <i class="fas fa-sign-out-alt" style="font-size: 12px;"></i>
-      </button>
-    `;
-    
-    userBadge.onmouseover = () => {
-      userBadge.style.transform = 'scale(1.05)';
-      userBadge.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
-    };
-    
-    userBadge.onmouseout = () => {
-      userBadge.style.transform = 'scale(1)';
-      userBadge.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-    };
-    
-    document.body.appendChild(userBadge);
-  }
+ 
   
   // Fonction de déconnexion globale
   window.logout = function() {
