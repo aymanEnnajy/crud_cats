@@ -25,6 +25,15 @@ const alertOk = document.getElementById('alertOk');
 // Variables pour la gestion
 let currentCatId = null;
 
+// ============================================
+// VARIABLES DE PAGINATION
+// ============================================
+let allCats = []; // Tous les chats
+let currentPage = 1;
+const catsPerPage = 3;
+let filteredCats = [];
+let showMoreContainer = null;
+
 // Initialiser les modales
 document.querySelectorAll('.close-modal').forEach(button => {
     button.addEventListener('click', () => {
@@ -42,6 +51,8 @@ modalConfirm.addEventListener('click', async () => {
     if (currentCatId) {
         await deleteCatFromDB(currentCatId);
         confirmationModal.classList.remove('show');
+        // Recharger tous les chats après suppression
+        allCats = await getAllCatsFromDB();
         await fetchCats(searchInput.value);
         populateTagFilter();
         showAlert('Chat supprimé avec succès !', 'success');
@@ -110,10 +121,245 @@ async function getCatFromDB(id) {
 }
 
 // ============================================
-// FONCTIONS PRINCIPALES
+// FONCTIONS DE PAGINATION
 // ============================================
 
-// Afficher tous les chats
+// Obtenir les chats pour la page courante
+function getCatsForCurrentPage() {
+    const startIndex = (currentPage - 1) * catsPerPage;
+    const endIndex = startIndex + catsPerPage;
+    return filteredCats.slice(startIndex, endIndex);
+}
+
+// Créer le bouton "Show More"
+function createShowMoreButton() {
+    const showMoreBtn = document.createElement('button');
+    showMoreBtn.id = 'showMoreBtn';
+    showMoreBtn.className = 'btn-primary';
+    showMoreBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Afficher plus de chats';
+    showMoreBtn.style.cssText = `
+        margin: 30px auto;
+        display: block;
+        max-width: 300px;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+    `;
+    
+    showMoreBtn.addEventListener('click', loadMoreCats);
+    
+    return showMoreBtn;
+}
+
+// Charger plus de chats
+function loadMoreCats() {
+    currentPage++;
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    
+    // Animation du bouton pendant le chargement
+    if (showMoreBtn) {
+        const originalHTML = showMoreBtn.innerHTML;
+        showMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
+        showMoreBtn.disabled = true;
+        
+        // Simuler un délai pour l'animation
+        setTimeout(() => {
+            // Ajouter les nouveaux chats
+            const newCats = getCatsForCurrentPage();
+            displayAdditionalCats(newCats);
+            
+            // Mettre à jour l'interface
+            updateShowMoreButton();
+            updatePageIndicator();
+            
+            // Restaurer le bouton
+            showMoreBtn.innerHTML = originalHTML;
+            showMoreBtn.disabled = false;
+            
+            // Scroller légèrement vers les nouveaux éléments
+            const lastCatCard = document.querySelector('.cat-card:last-child');
+            if (lastCatCard) {
+                lastCatCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 500);
+    }
+}
+
+// Afficher des chats supplémentaires
+function displayAdditionalCats(cats) {
+    cats.forEach((cat, index) => {
+        const div = document.createElement('div');
+        div.classList.add('cat-card');
+        div.style.animationDelay = `${index * 0.1}s`;
+        div.innerHTML = `
+            <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
+                 alt="${cat.name_cats}" 
+                 onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+            <div class="cat-card-content">
+                <h3>${cat.name_cats}</h3>
+                <div class="cat-tag">${cat.tag}</div>
+                <p>${cat.description}</p>
+                <div class="cat-card-actions">
+                    <button class="btn-primary" onclick="editCat(${cat.id})">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="btn-danger" onclick="deleteCat(${cat.id})">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Animation d'apparition
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(20px)';
+        catsList.appendChild(div);
+        
+        // Animation
+        setTimeout(() => {
+            div.style.transition = 'all 0.5s ease';
+            div.style.opacity = '1';
+            div.style.transform = 'translateY(0)';
+        }, 10);
+    });
+}
+
+// Mettre à jour l'affichage du bouton "Show More"
+function updateShowMoreButton() {
+    const totalPages = Math.ceil(filteredCats.length / catsPerPage);
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    
+    if (currentPage >= totalPages) {
+        // Masquer le bouton si on a tout affiché
+        if (showMoreBtn) {
+            showMoreBtn.style.display = 'none';
+            
+            // Afficher un message "Fin des résultats" si nécessaire
+            if (filteredCats.length > catsPerPage && !document.getElementById('endMessage')) {
+                const endDiv = document.createElement('div');
+                endDiv.id = 'endMessage';
+                endDiv.className = 'end-message';
+                endDiv.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>Tous les chats sont affichés</span>
+                `;
+                
+                // Ajouter après le bouton
+                if (showMoreContainer) {
+                    showMoreContainer.appendChild(endDiv);
+                }
+            }
+        }
+    } else {
+        // Afficher le bouton s'il y a plus de résultats
+        if (!showMoreBtn) {
+            const newShowMoreBtn = createShowMoreButton();
+            if (showMoreContainer) {
+                showMoreContainer.appendChild(newShowMoreBtn);
+            } else {
+                // Créer le conteneur si nécessaire
+                showMoreContainer = document.createElement('div');
+                showMoreContainer.id = 'showMoreContainer';
+                showMoreContainer.style.textAlign = 'center';
+                showMoreContainer.style.marginTop = '30px';
+                catsList.parentNode.appendChild(showMoreContainer);
+                showMoreContainer.appendChild(newShowMoreBtn);
+            }
+        } else {
+            showMoreBtn.style.display = 'block';
+        }
+        
+        // Supprimer le message de fin si présent
+        const endMessage = document.getElementById('endMessage');
+        if (endMessage) endMessage.remove();
+    }
+}
+
+// Mettre à jour l'indicateur de page
+function updatePageIndicator() {
+    const totalPages = Math.ceil(filteredCats.length / catsPerPage);
+    const displayedCount = Math.min(currentPage * catsPerPage, filteredCats.length);
+    
+    // Mettre à jour le compteur de chats
+    if (catsCount) {
+        catsCount.textContent = `${displayedCount}/${filteredCats.length}`;
+    }
+    
+    // Créer ou mettre à jour l'indicateur de page
+    let pageIndicator = document.getElementById('pageIndicator');
+    if (!pageIndicator && filteredCats.length > catsPerPage) {
+        pageIndicator = document.createElement('div');
+        pageIndicator.id = 'pageIndicator';
+        pageIndicator.className = 'page-indicator';
+        pageIndicator.style.cssText = `
+            text-align: center;
+            margin: 15px 0;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+        `;
+        
+        // Ajouter après le titre
+        const catsSection = document.querySelector('.cats-section h2');
+        if (catsSection && catsSection.parentNode) {
+            catsSection.parentNode.insertBefore(pageIndicator, catsSection.nextSibling);
+        }
+    }
+    
+    if (pageIndicator) {
+        pageIndicator.innerHTML = `
+            Page <strong>${currentPage}</strong> sur <strong>${totalPages}</strong>
+            <span style="margin: 0 10px">•</span>
+            <span style="color: var(--primary-color); font-weight: 600;">
+                ${displayedCount} sur ${filteredCats.length} chats
+            </span>
+        `;
+        
+        // Afficher/masquer selon le nombre de pages
+        pageIndicator.style.display = totalPages > 1 ? 'block' : 'none';
+    }
+}
+
+// Réinitialiser la pagination
+function resetPagination() {
+    currentPage = 1;
+}
+
+// Filtrer les chats (recherche + tag)
+function filterCats(cats, search = '', tag = '') {
+    let filtered = [...cats];
+    
+    // Filtre par recherche
+    if (search.trim()) {
+        const searchLower = search.toLowerCase();
+        filtered = filtered.filter(cat =>
+            cat.name_cats.toLowerCase().includes(searchLower) ||
+            cat.tag.toLowerCase().includes(searchLower) ||
+            cat.description.toLowerCase().includes(searchLower)
+        );
+    }
+    
+    // Filtre par tag
+    if (tag) {
+        filtered = filtered.filter(cat => cat.tag === tag);
+    }
+    
+    return filtered;
+}
+
+// ============================================
+// FONCTIONS PRINCIPALES MODIFIÉES
+// ============================================
+
+// Afficher tous les chats avec pagination
 async function fetchCats(search = '') {
     if (search.trim() !== '') {
         formSection.style.display = 'none';
@@ -121,26 +367,43 @@ async function fetchCats(search = '') {
         formSection.style.display = 'block';
     }
     
-    const cats = await getAllCatsFromDB(search);
-    catsList.innerHTML = '';
-
-    // appliquer filtre par tag si présent
+    // Charger tous les chats si nécessaire
+    if (allCats.length === 0) {
+        allCats = await getAllCatsFromDB();
+    }
+    
+    // Appliquer les filtres
     const selectedTag = tagFilter ? tagFilter.value : '';
-    const filteredCats = selectedTag ? cats.filter(c => c.tag === selectedTag) : cats;
-
+    filteredCats = filterCats(allCats, search, selectedTag);
+    
+    // Réinitialiser la pagination
+    resetPagination();
+    
+    // Effacer la liste actuelle
+    catsList.innerHTML = '';
+    
     if (filteredCats.length === 0) {
         emptyState.style.display = 'block';
         catsList.appendChild(emptyState);
         catCount.textContent = '0';
         catsCount.textContent = '0';
+        
+        // Cacher le bouton "Show More" et l'indicateur
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        if (showMoreBtn) showMoreBtn.style.display = 'none';
+        const pageIndicator = document.getElementById('pageIndicator');
+        if (pageIndicator) pageIndicator.style.display = 'none';
         return;
     }
 
     emptyState.style.display = 'none';
     catCount.textContent = filteredCats.length;
-    catsCount.textContent = filteredCats.length;
-
-    filteredCats.forEach((cat, index) => {
+    
+    // Afficher les chats de la page courante
+    const catsToDisplay = getCatsForCurrentPage();
+    catsCount.textContent = `${catsToDisplay.length}/${filteredCats.length}`;
+    
+    catsToDisplay.forEach((cat, index) => {
         const div = document.createElement('div');
         div.classList.add('cat-card');
         div.style.animationDelay = `${index * 0.1}s`;
@@ -164,9 +427,15 @@ async function fetchCats(search = '') {
         `;
         catsList.appendChild(div);
     });
+    
+    // Afficher/masquer le bouton "Show More"
+    updateShowMoreButton();
+    
+    // Mettre à jour l'indicateur de page
+    updatePageIndicator();
 }
 
-// Ajouter chat
+// Ajouter chat (modifié pour recharger tous les chats)
 addBtn.addEventListener('click', async () => {
     if (!nameInput.value || !tagInput.value || !descInput.value || !imgInput.value) {
         showAlert("Veuillez remplir tous les champs !");
@@ -200,6 +469,8 @@ addBtn.addEventListener('click', async () => {
             addBtn.disabled = false;
         }, 1500);
 
+        // Recharger tous les chats après ajout
+        allCats = await getAllCatsFromDB();
         await fetchCats(searchInput.value);
         populateTagFilter();
     } catch (error) {
@@ -215,7 +486,7 @@ function deleteCat(id) {
     confirmationModal.classList.add('show');
 }
 
-// Modifier chat
+// Modifier chat (modifié pour recharger après modification)
 async function editCat(id) {
     const cat = await getCatFromDB(id);
     if (!cat) {
@@ -252,6 +523,9 @@ async function editCat(id) {
         try {
             await updateCatInDB(id, updatedCat);
             editModal.classList.remove('show');
+            
+            // Recharger tous les chats après modification
+            allCats = await getAllCatsFromDB();
             await fetchCats(searchInput.value);
             populateTagFilter();
             showAlert('Chat modifié avec succès !', 'success');
@@ -285,7 +559,10 @@ searchInput.addEventListener('input', (e) => {
     if (e.target.value.trim() !== '') formSection.style.display = 'none';
     else formSection.style.display = 'block';
     
-    searchTimeout = setTimeout(() => fetchCats(e.target.value), 300);
+    searchTimeout = setTimeout(() => {
+        const selectedTag = tagFilter ? tagFilter.value : '';
+        fetchCats(e.target.value, selectedTag);
+    }, 300);
 });
 
 // Remplir la sélection des tags
@@ -306,7 +583,9 @@ async function populateTagFilter() {
 }
 
 if (tagFilter) {
-    tagFilter.addEventListener('change', () => fetchCats(searchInput.value));
+    tagFilter.addEventListener('change', () => {
+        fetchCats(searchInput.value, tagFilter.value);
+    });
 }
 
 // Fonction d'alerte
@@ -336,6 +615,85 @@ document.addEventListener('DOMContentLoaded', () => {
     populateTagFilter();
     const title = document.querySelector('.header h1');
     if (title) title.style.animation = 'fadeInDown 0.8s ease';
+    
+    // Ajouter les styles CSS pour la pagination
+    addPaginationStyles();
 });
 
-/*filter*/
+// ============================================
+// STYLES CSS POUR LA PAGINATION
+// ============================================
+
+function addPaginationStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Styles pour la pagination */
+        .end-message {
+            background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 400px;
+            text-align: center;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .end-message i {
+            font-size: 1.5rem;
+            color: #0ea5e9;
+        }
+        
+        .end-message span {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .page-indicator {
+            background: var(--light-color);
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: 2px solid var(--light-gray);
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95rem;
+            color: var(--gray-color);
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-indicator strong {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        #showMoreBtn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #showMoreBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        
+        #showMoreBtn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+}

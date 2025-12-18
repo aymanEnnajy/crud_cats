@@ -171,7 +171,7 @@ body {
     }
 }
 #tagFilter{
-    height: 11vh;
+    height: 8vh;
 }
 /* Formulaire */
 .form-section h2 {
@@ -531,8 +531,9 @@ button {
     
     .search-counter {
         position: static;
-        margin-top: 10px;
+        margin-top: 30px;
         display: inline-block;
+
     }
 }
 
@@ -545,5 +546,12 @@ button {
 @media (max-width:767px) {
     .navbar{
         margin-left: 0px;
+    }
+    #search{
+        width: 86vw;
+        font-size: 0.9rem;
+    }
+    .search-icon{
+        top:25%;
     }
 }
