@@ -1,0 +1,6 @@
+name = "proj-full-api"
+main = "worker.js"
+compatibility_date = "2025-12-18"
+
+[vars]
+ENV = "production"
