@@ -49,13 +49,17 @@ modalCancel.addEventListener('click', () => {
 
 modalConfirm.addEventListener('click', async () => {
     if (currentCatId) {
-        await deleteCatFromDB(currentCatId);
-        confirmationModal.classList.remove('show');
-        // Recharger tous les chats après suppression
-        allCats = await getAllCatsFromDB();
-        await fetchCats(searchInput.value);
-        populateTagFilter();
-        showAlert('Chat supprimé avec succès !', 'success');
+        try {
+            await deleteCatFromDB(currentCatId);
+            confirmationModal.classList.remove('show');
+            // Recharger tous les chats après suppression
+            allCats = await getAllCatsFromDB();
+            await fetchCats(searchInput.value);
+            populateTagFilter();
+            showAlert('Chat supprimé avec succès !', 'success');
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
     }
 });
 
@@ -96,7 +100,11 @@ async function addCatToDB(cat) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cat)
     });
-    return await res.json();
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.error || 'Erreur lors de l\'ajout du chat');
+    }
+    return data;
 }
 
 // Modifier un chat
@@ -106,12 +114,21 @@ async function updateCatInDB(id, cat) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cat)
     });
-    return await res.json();
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.error || 'Erreur lors de la modification');
+    }
+    return data;
 }
 
 // Supprimer un chat
 async function deleteCatFromDB(id) {
-    await fetch(`/api/cats/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/cats/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.error || 'Erreur lors de la suppression');
+    }
+    return data;
 }
 
 // Récupérer un chat par ID
