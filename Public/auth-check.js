@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cas spécial: Si on est déjà connecté => redirection vers l'accueil
     if (token && user) {
       console.log('Redirection vers index (déjà connecté)');
-      window.location.href = '/';
+      //window.location.href = '/';
     }
     // Sinon, on reste sur la page. C'est TOUT. Pas de redirection vers login ici.
     return;
