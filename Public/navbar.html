@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Chats</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Ajoutez cette div pour contenir la navbar -->
+<div id="navbar-root"></div>
+
+<script src="navbar.js"></script>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Logo -->
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-cat"></i>
+                <div class="nav-logo-text">
+                    <span class="nav-logo-title">ChatManager</span>
+                    <span class="nav-logo-subtitle">Gestion Féline</span>
+                </div>
+            </a>
+
+            <!-- Menu mobile toggle -->
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Menu principal -->
+            <div class="nav-menu" id="navMenu">
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="about.html" class="nav-link">
+                        <i class="fas fa-info-circle"></i>
+                        <span>À Propos</span>
+                    </a>
+                    <a href="contact.html" class="nav-link">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                    </a>
+                </div>
+
+                <!-- Informations utilisateur (si connecté) -->
+                <div id="userNavSection" class="user-nav-info" style="display: none;">
+                    <div class="user-avatar-nav">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details-nav">
+                        <div class="user-name-nav" id="navUserName"></div>
+                        <div class="user-email-nav" id="navUserEmail"></div>
+                    </div>
+                    <button class="logout-btn-nav" onclick="logout()" title="Déconnexion">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Gestion du menu mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.innerHTML = navMenu.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+
+            // Fermer le menu en cliquant sur un lien
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+        }
+
+        // Vérifier si l'utilisateur est connecté
+        function checkUserAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const userSection = document.getElementById('userNavSection');
+            
+            if (user && userSection) {
+                document.getElementById('navUserName').textContent = user.username || 'Utilisateur';
+                document.getElementById('navUserEmail').textContent = user.email || '';
+                userSection.style.display = 'flex';
+            }
+        }
+
+        // Fonction de déconnexion
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Marquer le lien actif
+        function setActiveLink() {
+            const currentPage = window.location.pathname.split('/').pop();
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialiser
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserAuth();
+            setActiveLink();
+        });
+    </script>
+</body>
+</html>

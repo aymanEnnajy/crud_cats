@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À Propos - Gestion des Chats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="navbar.css">
+    <style>
+        /* Styles spécifiques à la page À Propos */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Hero Section */
+        .about-hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .about-hero i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .about-hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Content Cards */
+        .about-content {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .about-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .about-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .about-card h2 i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .about-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .feature-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .feature-content h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .feature-content p {
+            font-size: 0.95rem;
+            color: var(--gray);
+            margin: 0;
+        }
+
+        /* Team Section */
+        .team-section {
+            margin-top: 50px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .member-avatar {
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .member-info {
+            padding: 25px;
+        }
+
+        .member-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .member-role {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Stats */
+        .stats-section {
+            background: linear-gradient(135deg, var(--dark), #334155);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 20px;
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 20px;
+            margin-top: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .cta-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .cta-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .cta-btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid #e2e8f0;
+        }
+
+        .cta-btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 20px 15px;
+            }
+
+            .about-hero {
+                padding: 40px 20px;
+            }
+
+            .about-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .about-hero p {
+                font-size: 1.1rem;
+            }
+
+            .about-card {
+                padding: 25px;
+            }
+
+            .about-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about-hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .about-hero i {
+                font-size: 48px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .about-hero,
+        .about-card,
+        .feature-item,
+        .team-member,
+        .stat-item {
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .about-card:nth-child(1) { animation-delay: 0.1s; }
+        .about-card:nth-child(2) { animation-delay: 0.2s; }
+        .about-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-item:nth-child(1) { animation-delay: 0.4s; }
+        .feature-item:nth-child(2) { animation-delay: 0.5s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        .feature-item:nth-child(4) { animation-delay: 0.7s; }
+    </style>
+</head>
+<body>
+<!-- Ajoutez cette div pour contenir la navbar -->
+<div id="navbar-root"></div>
+
+<script src="navbar.js"></script>
+    <!-- Inclusion de la navbar -->
+    <div id="navbar-container"></div>
+
+    <div class="page-container">
+        <!-- Hero Section -->
+        <section class="about-hero">
+            <i class="fas fa-cat"></i>
+            <h1>À Propos de ChatManager</h1>
+            <p>Votre solution complète pour la gestion et le suivi des profils de chats. Conçu avec passion pour les amoureux des félins.</p>
+        </section>
+
+        <!-- Mission -->
+        <section class="about-content">
+            <div class="about-card">
+                <h2><i class="fas fa-bullseye"></i> Notre Mission</h2>
+                <p>Chez ChatManager, nous croyons que chaque chat mérite une gestion attentionnée et organisée. Notre mission est de fournir aux propriétaires de chats, aux refuges et aux amoureux des félins un outil puissant, simple et élégant pour gérer efficacement leurs compagnons à quatre pattes.</p>
+                <p>Nous combinons technologie moderne et compréhension des besoins réels pour créer une expérience qui simplifie votre quotidien tout en mettant le bien-être des chats au premier plan.</p>
+            </div>
+
+            <div class="about-card">
+                <h2><i class="fas fa-history"></i> Notre Histoire</h2>
+                <p>Fondé en 2023 par une équipe de passionnés de chats et de développeurs web, ChatManager est né d'un constat simple : il existait peu d'outils dédiés spécifiquement à la gestion des profils de chats, malgré l'importance croissante des animaux de compagnie dans nos vies.</p>
+                <p>Ce qui a commencé comme un projet personnel pour gérer les chats d'un refuge local s'est transformé en une plateforme complète utilisée par des milliers de personnes à travers le monde.</p>
+            </div>
+
+            <!-- Features -->
+            <div class="about-card">
+                <h2><i class="fas fa-star"></i> Pourquoi Nous Choisir ?</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Sécurisé</h3>
+                            <p>Vos données sont chiffrées et protégées avec les standards les plus élevés.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Mobile First</h3>
+                            <p>Conçu pour être parfaitement utilisable sur tous vos appareils.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Rapide</h3>
+                            <p>Interface optimisée pour une expérience fluide et réactive.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Fait avec Amour</h3>
+                            <p>Développé par des amoureux des chats, pour les amoureux des chats.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-section">
+            <h2 style="font-size: 2rem; margin-bottom: 20px;">ChatManager en Chiffres</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="catsCount">5000+</div>
+                    <div class="stat-label">Chats Gérés</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="usersCount">2000+</div>
+                    <div class="stat-label">Utilisateurs Satisfaits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Disponible</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Satisfaction Client</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team (optionnel) -->
+        <section class="team-section">
+            <div class="about-card">
+                <h2><i class="fas fa-users"></i> Notre Équipe</h2>
+                <p>Une équipe passionnée qui travaille chaque jour pour améliorer votre expérience avec ChatManager.</p>
+                
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="member-info">
+                            <h3>Alexandre Martin</h3>
+                            <span class="member-role">Fondateur & Développeur</span>
+                            <p>Passionné de chats et de technologie depuis toujours.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="member-info">
+                            <h3>Dr. Sophie Leroy</h3>
+                            <span class="member-role">Vétérinaire Conseillère</span>
+                            <p>Garantit le bien-être animal dans nos fonctionnalités.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <div class="member-info">
+                            <h3>Julie Dubois</h3>
+                            <span class="member-role">Designer UX/UI</span>
+                            <p>Crée des interfaces intuitives et agréables à utiliser.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2>Prêt à Gérer Vos Chats ?</h2>
+            <p>Rejoignez des milliers de propriétaires de chats qui ont simplifié leur quotidien avec ChatManager.</p>
+            
+            <div class="cta-buttons">
+                <a href="index.html" class="cta-btn cta-btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Commencer Maintenant
+                </a>
+                <a href="contact.html" class="cta-btn cta-btn-secondary">
+                    <i class="fas fa-envelope"></i>
+                    Nous Contacter
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Navbar injectée dynamiquement via navbar.js
+
+        // Gestion du menu mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.innerHTML = navMenu.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+        }
+
+        // Vérifier si l'utilisateur est connecté
+        function checkUserAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            const userSection = document.getElementById('userNavSection');
+            
+            if (user && userSection) {
+                document.getElementById('navUserName').textContent = user.username || 'Utilisateur';
+                document.getElementById('navUserEmail').textContent = user.email || '';
+                userSection.style.display = 'flex';
+            }
+        }
+
+        // Fonction de déconnexion
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Initialiser
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserAuth();
+            
+            // Mettre à jour les stats (exemple)
+            setTimeout(() => {
+                document.getElementById('catsCount').textContent = '5000+';
+                document.getElementById('usersCount').textContent = '2000+';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
