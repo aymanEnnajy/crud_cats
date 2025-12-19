@@ -157,6 +157,59 @@ export default {
     }
 
     // -----------------------
+    // ROUTE GET /api/auth/verify
+    // -----------------------
+    if (url.pathname === "/api/auth/verify" && method === "GET") {
+      const authHeader = request.headers.get("Authorization");
+
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Token manquant" }), { status: 401, headers: { "Content-Type": "application/json" } });
+      }
+
+      const token = authHeader.split(' ')[1]; // Format: "Bearer token"
+
+      if (!token) {
+        return new Response(JSON.stringify({ error: "Token mal formaté" }), { status: 401, headers: { "Content-Type": "application/json" } });
+      }
+
+      // Vérification simple du token
+      const tokenParts = token.split('-');
+      if (tokenParts.length < 3 || tokenParts[0] !== 'simple' || tokenParts[1] !== 'token') {
+        return new Response(JSON.stringify({ error: "Token invalide" }), { status: 403, headers: { "Content-Type": "application/json" } });
+      }
+
+      const userId = tokenParts[2];
+
+      try {
+        const { results: users } = await env.DB
+          .prepare("SELECT id, username, email FROM users WHERE id = ?")
+          .bind(userId)
+          .all();
+
+        if (users.length === 0) {
+          return new Response(JSON.stringify({ error: "Utilisateur non trouvé" }), { status: 404, headers: { "Content-Type": "application/json" } });
+        }
+
+        return new Response(JSON.stringify({
+          valid: true,
+          user: users[0]
+        }), { headers: { "Content-Type": "application/json" } });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+      }
+    }
+
+    // -----------------------
+    // ROUTE POST /api/auth/logout
+    // -----------------------
+    if (url.pathname === "/api/auth/logout" && method === "POST") {
+      return new Response(JSON.stringify({
+        message: 'Déconnexion réussie',
+        success: true
+      }), { headers: { "Content-Type": "application/json" } });
+    }
+
+    // -----------------------
     // ROUTE par défaut
     // -----------------------
     return new Response("Worker API online ✅", { headers: { "Content-Type": "text/plain" } });

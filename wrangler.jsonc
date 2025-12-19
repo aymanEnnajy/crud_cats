@@ -1,18 +1,24 @@
 {
-    "name": "proj-full-api",
-    "main": "worker.js",
-    "compatibility_date": "2025-12-18",
-    "vars": {
-        "ENV": "production"
-    },
-    "assets": {
-        "directory": "./Public"
-    },
-    "d1_databases": [
-        {
-            "binding": "DB",
-            "database_name": "proj_full_db",
-            "database_id": "REPLACE_WITH_YOUR_DB_ID"
-        }
-    ]
+	"name": "proj-full-api",
+	"main": "worker.js",
+	"compatibility_date": "2025-12-18",
+	"vars": {
+		"ENV": "production"
+	},
+	"assets": {
+		"directory": "./Public"
+	},
+	"d1_databases": [
+		{
+			"binding": "proj_full_db",
+			"database_name": "proj_full_db",
+			"database_id": "8a0a0954-ceca-4538-8647-3929bea389f7"
+		},
+		{
+			"binding": "proj_full_db",
+			"database_name": "proj_full_db",
+			"database_id": "8a0a0954-ceca-4538-8647-3929bea389f7",
+			"remote": true
+		}
+	]
 }
