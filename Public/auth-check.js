@@ -1,52 +1,42 @@
-// auth-check.js - Placez ce fichier dans le dossier public/
-(function () {
+// auth-check.js - Version corrigée via détection DOM (plus fiable)
+document.addEventListener('DOMContentLoaded', function () {
   // Vérifier si l'utilisateur est connecté
   const token = localStorage.getItem('authToken');
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-  // Pages autorisées sans connexion (noms sans extension)
-  const publicPages = ['login', 'register', 'auth-check', 'style.css'];
+  // Détection fiable de la page via le DOM (évite les problèmes de parsing d'URL)
+  // Si le formulaire de login existe, on est sur la page login.
+  const isLoginPage = document.getElementById('loginForm');
+  // Si le formulaire d'inscription existe, on est sur la page register.
+  const isRegisterPage = document.getElementById('registerForm');
 
-  // Récupérer le nom de la page courante (sans extension)
-  let path = window.location.pathname;
-  let currentPage = path.split('/').pop().split('?')[0]; // Enlever params
+  const isPublicPage = isLoginPage || isRegisterPage;
 
-  // Enlever l'extension .html si présente pour la comparaison
-  if (currentPage.endsWith('.html')) {
-    currentPage = currentPage.slice(0, -5);
-  }
+  console.log('Auth check:', { token, isLoginPage: !!isLoginPage, isRegisterPage: !!isRegisterPage });
 
-  // Gérer la racine (homepage) -> index
-  if (currentPage === '' || currentPage === 'index') {
-    currentPage = 'index';
-  }
-
-  console.log('Auth check:', { token, currentPage });
-
-  // Si on est sur une page publique, on arrête ici (pas de redirection vers login)
-  if (publicPages.includes(currentPage)) {
-    // Cas spécial: Si on est sur login/register et qu'on est déjà connecté -> rediriger ver l'accueil
-    if (token && user && (currentPage === 'login' || currentPage === 'register')) {
+  // 1. GESTION DES PAGES PUBLIQUES (Login/Register)
+  if (isPublicPage) {
+    // Cas spécial: Si on est déjà connecté => redirection vers l'accueil
+    if (token && user) {
       console.log('Redirection vers index (déjà connecté)');
-      window.location.href = '/'; // Aller à la racine
+      window.location.href = '/';
     }
+    // Sinon, on reste sur la page. C'est TOUT. Pas de redirection vers login ici.
     return;
   }
 
-  // Si on est ici, c'est une page protégée (comme index)
-  // Si pas connecté, rediriger vers login
+  // 2. GESTION DES PAGES PROTÉGÉES (Toutes les autres pages)
+  // Si pas connecté => redirection vers login
   if (!token) {
-    console.log('Redirection vers login');
+    console.log('Redirection vers login (Token manquant)');
     window.location.href = 'login.html';
     return;
   }
 
-  // Afficher les infos utilisateur si connecté
-
+  // --- Fonctions globales ---
 
   // Fonction de déconnexion globale
   window.logout = function () {
-    // Optionnel: Appeler l'API de déconnexion
     fetch('/api/auth/logout', {
       method: 'POST',
       headers: {
@@ -55,33 +45,23 @@
       }
     }).catch(err => console.log('Logout API error:', err));
 
-    // Nettoyer le localStorage
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-
-    // Rediriger vers login
     window.location.href = 'login.html';
   };
 
   // Fonction pour vérifier le token avec le serveur (optionnel)
   window.verifyToken = async function () {
     if (!token) return false;
-
     try {
       const response = await fetch('/api/auth/verify', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
       if (!response.ok) {
         console.log('Token invalide, déconnexion...');
         window.logout();
         return false;
       }
-
-      const data = await response.json();
-      console.log('Token valide:', data.user);
       return true;
     } catch (error) {
       console.error('Erreur vérification token:', error);
@@ -89,8 +69,8 @@
     }
   };
 
-  // Vérifier le token au chargement (optionnel)
+  // Vérifier le token au chargement si connecté
   if (token && user) {
     setTimeout(() => verifyToken(), 1000);
   }
-})();
+});
