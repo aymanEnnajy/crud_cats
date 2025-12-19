@@ -33,13 +33,12 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO users (id, username, email, password_hash, created_at, updated_at) VALUES
 (1, 'ayman', 'ayman93011@gmail.com', 'Azerty123', '2025-12-17 14:15:02', '2025-12-17 14:15:02');
 
-DROP TABLE IF EXISTS adoptions;
-CREATE TABLE IF NOT EXISTS adoptions (
+DROP TABLE IF EXISTS user_sessions;
+CREATE TABLE IF NOT EXISTS user_sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  cat_id INTEGER NOT NULL,
-  status TEXT DEFAULT 'pending', -- pending, confirmed
+  user_id INTEGER DEFAULT NULL,
+  session_token TEXT NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (cat_id) REFERENCES cats(id)
+  UNIQUE(session_token)
 );
