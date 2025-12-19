@@ -1,10 +1,6 @@
 (function () {
   console.log("Auth-Check starting...");
 
-  // NUCLEAR FIX: On demande de vider le localStorage pour arrêter la boucle
-  localStorage.clear();
-  console.log("LocalStorage cleared by force.");
-
   // 1. Détection de la page courante (Double Check: DOM + URL)
   // On regarde si on est sur Login ou Register
   const domLogin = document.getElementById('loginForm');

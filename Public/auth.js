@@ -8,9 +8,14 @@ class AuthManager {
     }
 
     init() {
-        // Vérifier si on est sur la page login ou register
-        if (window.location.pathname.includes('login.html') || 
-            window.location.pathname.includes('register.html')) {
+        // Fix: Cloudflare serves pages without .html extension
+        const path = window.location.pathname.toLowerCase();
+
+        // Vérifier si on est sur la page login ou register (avec ou sans .html)
+        const isLoginPage = path.includes('login') || !!document.getElementById('loginForm');
+        const isRegisterPage = path.includes('register') || !!document.getElementById('registerForm');
+
+        if (isLoginPage || isRegisterPage) {
             this.setupAuthPages();
         } else {
             this.checkAuth();
@@ -42,7 +47,7 @@ class AuthManager {
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
@@ -72,9 +77,9 @@ class AuthManager {
                 // Sauvegarder le token et les infos utilisateur
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                
+
                 this.showAlert('Connexion réussie !', 'success');
-                
+
                 // Rediriger vers la page principale après un court délai
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -102,7 +107,7 @@ class AuthManager {
 
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const username = usernameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -145,9 +150,9 @@ class AuthManager {
                 // Sauvegarder le token et les infos utilisateur
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                
+
                 this.showAlert('Inscription réussie !', 'success');
-                
+
                 // Rediriger vers la page principale après un court délai
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -164,7 +169,7 @@ class AuthManager {
     validatePassword() {
         const password = document.getElementById('password')?.value || '';
         const confirmPassword = document.getElementById('confirmPassword')?.value || '';
-        
+
         // Validation de la longueur
         const reqLength = document.getElementById('reqLength');
         if (reqLength) {
@@ -194,7 +199,7 @@ class AuthManager {
         // Toggle pour le mot de passe
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
-        
+
         if (togglePassword && passwordInput) {
             togglePassword.addEventListener('click', () => {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -206,7 +211,7 @@ class AuthManager {
         // Toggle pour la confirmation du mot de passe
         const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-        
+
         if (toggleConfirmPassword && confirmPasswordInput) {
             toggleConfirmPassword.addEventListener('click', () => {
                 const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -219,7 +224,7 @@ class AuthManager {
     showAlert(message, type = 'info') {
         const alertDiv = document.getElementById('alert');
         const alertMessage = document.getElementById('alertMessage');
-        
+
         if (!alertDiv || !alertMessage) return;
 
         alertDiv.className = `alert alert-${type}`;
@@ -280,14 +285,14 @@ class AuthManager {
     addLogoutButton() {
         // Chercher si un bouton de déconnexion existe déjà
         let logoutBtn = document.getElementById('logoutBtn');
-        
+
         if (!logoutBtn) {
             logoutBtn = document.createElement('button');
             logoutBtn.id = 'logoutBtn';
             logoutBtn.className = 'btn btn-danger';
             logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Déconnexion';
             logoutBtn.onclick = () => this.logout();
-            
+
             // Ajouter le bouton dans le header ou une section appropriée
             const header = document.querySelector('header');
             if (header) {
