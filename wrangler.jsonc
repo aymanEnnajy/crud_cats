@@ -10,7 +10,7 @@
     },
     "d1_databases": [
         {
-            "binding": "proj_full_db",
+            "binding": "DB",
             "database_name": "proj_full_db",
             "database_id": "8a0a0954-ceca-4538-8647-3929bea389f7"
         }
