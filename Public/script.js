@@ -491,7 +491,7 @@ addBtn.addEventListener('click', async () => {
         await fetchCats(searchInput.value);
         populateTagFilter();
     } catch (error) {
-        showAlert('Erreur lors de l\'ajout du chat', 'danger');
+        showAlert(error.message, 'danger');
         addBtn.innerHTML = originalText;
         addBtn.disabled = false;
     }
