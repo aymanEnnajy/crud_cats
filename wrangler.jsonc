@@ -1,6 +1,6 @@
 {
     "name": "crud-cats",
-    "main": "worker.js",
+    "main": "app.js",
     "compatibility_date": "2025-12-18",
     "vars": {
         "ENV": "production"
