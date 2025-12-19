@@ -3,12 +3,14 @@
 DROP TABLE IF EXISTS cats;
 CREATE TABLE IF NOT EXISTS cats (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
   name_cats TEXT NOT NULL,
   tag TEXT DEFAULT NULL,
   description TEXT,
   images TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 INSERT INTO cats (id, name_cats, tag, description, images, created_at, updated_at) VALUES
