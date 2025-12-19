@@ -1,5 +1,5 @@
 {
-    "name": "proj-full-api",
+    "name": "crud-cats",
     "main": "worker.js",
     "compatibility_date": "2025-12-18",
     "vars": {
