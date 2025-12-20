@@ -76,10 +76,7 @@ window.addEventListener('click', (e) => {
 
 // Récupérer tous les chats
 async function getAllCatsFromDB(search = '') {
-    const token = localStorage.getItem('authToken');
-    const res = await fetch('/api/cats', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetch('/api/cats');
     let cats = await res.json();
     if (search.trim()) {
         const searchLower = search.toLowerCase();
@@ -94,13 +91,9 @@ async function getAllCatsFromDB(search = '') {
 
 // Ajouter un chat
 async function addCatToDB(cat) {
-    const token = localStorage.getItem('authToken');
     const res = await fetch('/api/cats', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cat)
     });
     return await res.json();
@@ -108,13 +101,9 @@ async function addCatToDB(cat) {
 
 // Modifier un chat
 async function updateCatInDB(id, cat) {
-    const token = localStorage.getItem('authToken');
     const res = await fetch(`/api/cats/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cat)
     });
     return await res.json();
@@ -122,11 +111,7 @@ async function updateCatInDB(id, cat) {
 
 // Supprimer un chat
 async function deleteCatFromDB(id) {
-    const token = localStorage.getItem('authToken');
-    await fetch(`/api/cats/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
+    await fetch(`/api/cats/${id}`, { method: 'DELETE' });
 }
 
 // Récupérer un chat par ID
