@@ -539,9 +539,9 @@ button {
 
 /* Ajoutez ceci dans le style de chaque page */
 .navbar{
-    margin-top: -20px !important;
+    margin-top: 0px !important;
     width: 100vw !important;
-    margin-left: -21px;
+    margin-left: 0px;
 }
 @media (max-width:767px) {
     .navbar{

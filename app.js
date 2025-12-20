@@ -51,23 +51,16 @@ if (url.pathname.startsWith("/api/cats/") && method === "PUT") {
     const body = await request.json();
     const { name_cats, tag, description, images } = body;
 
-    // Récupérer le token
+    // Extraire userId depuis le token
     const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Token manquant" }), { status: 401, headers: { "Content-Type": "application/json" } });
-    }
+    if (!authHeader) return new Response(JSON.stringify({ error: "Token manquant" }), { status: 401, headers: { "Content-Type": "application/json" } });
     const token = authHeader.split(' ')[1];
-    const tokenParts = token.split('-');
-    const userId = tokenParts[2];
+    const userId = token.split('-')[2];
 
-    // Vérifier le propriétaire
+    // Vérifier propriétaire
     const { results: cats } = await env.DB.prepare("SELECT id_user FROM cats WHERE id=?").bind(id).all();
-    if (cats.length === 0) {
-      return new Response(JSON.stringify({ error: "Cat non trouvé" }), { status: 404, headers: { "Content-Type": "application/json" } });
-    }
-    if (cats[0].id_user != userId) {
-      return new Response(JSON.stringify({ error: "Vous n'êtes pas autorisé à modifier cette cat" }), { status: 403, headers: { "Content-Type": "application/json" } });
-    }
+    if (cats.length === 0) return new Response(JSON.stringify({ error: "Cat non trouvé" }), { status: 404, headers: { "Content-Type": "application/json" } });
+    if (cats[0].id_user != userId) return new Response(JSON.stringify({ error: "Action impossible : vous n'êtes pas le propriétaire" }), { status: 403, headers: { "Content-Type": "application/json" } });
 
     // Mise à jour
     await env.DB.prepare(
@@ -76,6 +69,7 @@ if (url.pathname.startsWith("/api/cats/") && method === "PUT") {
 
     const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(id).all();
     return new Response(JSON.stringify({ message: "Cat modifiée avec succès", cat: results[0] }), { headers: { "Content-Type": "application/json" } });
+
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
@@ -89,27 +83,21 @@ if (url.pathname.startsWith("/api/cats/") && method === "DELETE") {
   try {
     const id = url.pathname.split("/").pop();
 
-    // Récupérer le token
+    // Extraire userId depuis le token
     const authHeader = request.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Token manquant" }), { status: 401, headers: { "Content-Type": "application/json" } });
-    }
+    if (!authHeader) return new Response(JSON.stringify({ error: "Token manquant" }), { status: 401, headers: { "Content-Type": "application/json" } });
     const token = authHeader.split(' ')[1];
-    const tokenParts = token.split('-');
-    const userId = tokenParts[2];
+    const userId = token.split('-')[2];
 
-    // Vérifier le propriétaire
+    // Vérifier propriétaire
     const { results: cats } = await env.DB.prepare("SELECT id_user FROM cats WHERE id=?").bind(id).all();
-    if (cats.length === 0) {
-      return new Response(JSON.stringify({ error: "Cat non trouvé" }), { status: 404, headers: { "Content-Type": "application/json" } });
-    }
-    if (cats[0].id_user != userId) {
-      return new Response(JSON.stringify({ error: "Vous n'êtes pas autorisé à supprimer cette cat" }), { status: 403, headers: { "Content-Type": "application/json" } });
-    }
+    if (cats.length === 0) return new Response(JSON.stringify({ error: "Cat non trouvé" }), { status: 404, headers: { "Content-Type": "application/json" } });
+    if (cats[0].id_user != userId) return new Response(JSON.stringify({ error: "Action impossible : vous n'êtes pas le propriétaire" }), { status: 403, headers: { "Content-Type": "application/json" } });
 
     // Suppression
     await env.DB.prepare("DELETE FROM cats WHERE id=?").bind(id).run();
     return new Response(JSON.stringify({ message: "Cat supprimée avec succès" }), { headers: { "Content-Type": "application/json" } });
+
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
