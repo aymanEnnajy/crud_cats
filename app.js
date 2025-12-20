@@ -27,7 +27,7 @@ export default {
 
         const { lastInsertRowid } = await env.DB
           .prepare(
-            "INSERT INTO cats (name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            "INSERT INTO cats (id_user,name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
           )
           .bind(name_cats, tag, description, images)
           .run();

@@ -145,9 +145,9 @@ function createShowMoreButton() {
         padding: 15px;
         font-size: 1.1rem;
     `;
-
+    
     showMoreBtn.addEventListener('click', loadMoreCats);
-
+    
     return showMoreBtn;
 }
 
@@ -155,27 +155,27 @@ function createShowMoreButton() {
 function loadMoreCats() {
     currentPage++;
     const showMoreBtn = document.getElementById('showMoreBtn');
-
+    
     // Animation du bouton pendant le chargement
     if (showMoreBtn) {
         const originalHTML = showMoreBtn.innerHTML;
         showMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
         showMoreBtn.disabled = true;
-
+        
         // Simuler un délai pour l'animation
         setTimeout(() => {
             // Ajouter les nouveaux chats
             const newCats = getCatsForCurrentPage();
             displayAdditionalCats(newCats);
-
+            
             // Mettre à jour l'interface
             updateShowMoreButton();
             updatePageIndicator();
-
+            
             // Restaurer le bouton
             showMoreBtn.innerHTML = originalHTML;
             showMoreBtn.disabled = false;
-
+            
             // Scroller légèrement vers les nouveaux éléments
             const lastCatCard = document.querySelector('.cat-card:last-child');
             if (lastCatCard) {
@@ -209,12 +209,12 @@ function displayAdditionalCats(cats) {
                 </div>
             </div>
         `;
-
+        
         // Animation d'apparition
         div.style.opacity = '0';
         div.style.transform = 'translateY(20px)';
         catsList.appendChild(div);
-
+        
         // Animation
         setTimeout(() => {
             div.style.transition = 'all 0.5s ease';
@@ -228,12 +228,12 @@ function displayAdditionalCats(cats) {
 function updateShowMoreButton() {
     const totalPages = Math.ceil(filteredCats.length / catsPerPage);
     const showMoreBtn = document.getElementById('showMoreBtn');
-
+    
     if (currentPage >= totalPages) {
         // Masquer le bouton si on a tout affiché
         if (showMoreBtn) {
             showMoreBtn.style.display = 'none';
-
+            
             // Afficher un message "Fin des résultats" si nécessaire
             if (filteredCats.length > catsPerPage && !document.getElementById('endMessage')) {
                 const endDiv = document.createElement('div');
@@ -243,7 +243,7 @@ function updateShowMoreButton() {
                     <i class="fas fa-check-circle"></i>
                     <span>Tous les chats sont affichés</span>
                 `;
-
+                
                 // Ajouter après le bouton
                 if (showMoreContainer) {
                     showMoreContainer.appendChild(endDiv);
@@ -268,7 +268,7 @@ function updateShowMoreButton() {
         } else {
             showMoreBtn.style.display = 'block';
         }
-
+        
         // Supprimer le message de fin si présent
         const endMessage = document.getElementById('endMessage');
         if (endMessage) endMessage.remove();
@@ -279,12 +279,12 @@ function updateShowMoreButton() {
 function updatePageIndicator() {
     const totalPages = Math.ceil(filteredCats.length / catsPerPage);
     const displayedCount = Math.min(currentPage * catsPerPage, filteredCats.length);
-
+    
     // Mettre à jour le compteur de chats
     if (catsCount) {
         catsCount.textContent = `${displayedCount}/${filteredCats.length}`;
     }
-
+    
     // Créer ou mettre à jour l'indicateur de page
     let pageIndicator = document.getElementById('pageIndicator');
     if (!pageIndicator && filteredCats.length > catsPerPage) {
@@ -306,14 +306,14 @@ function updatePageIndicator() {
             border: 1px solid #e2e8f0;
             display: inline-block;
         `;
-
+        
         // Ajouter après le titre
         const catsSection = document.querySelector('.cats-section h2');
         if (catsSection && catsSection.parentNode) {
             catsSection.parentNode.insertBefore(pageIndicator, catsSection.nextSibling);
         }
     }
-
+    
     if (pageIndicator) {
         pageIndicator.innerHTML = `
             Page <strong>${currentPage}</strong> sur <strong>${totalPages}</strong>
@@ -322,7 +322,7 @@ function updatePageIndicator() {
                 ${displayedCount} sur ${filteredCats.length} chats
             </span>
         `;
-
+        
         // Afficher/masquer selon le nombre de pages
         pageIndicator.style.display = totalPages > 1 ? 'block' : 'none';
     }
@@ -336,7 +336,7 @@ function resetPagination() {
 // Filtrer les chats (recherche + tag)
 function filterCats(cats, search = '', tag = '') {
     let filtered = [...cats];
-
+    
     // Filtre par recherche
     if (search.trim()) {
         const searchLower = search.toLowerCase();
@@ -346,12 +346,12 @@ function filterCats(cats, search = '', tag = '') {
             cat.description.toLowerCase().includes(searchLower)
         );
     }
-
+    
     // Filtre par tag
     if (tag) {
         filtered = filtered.filter(cat => cat.tag === tag);
     }
-
+    
     return filtered;
 }
 
@@ -366,28 +366,28 @@ async function fetchCats(search = '') {
     } else {
         formSection.style.display = 'block';
     }
-
+    
     // Charger tous les chats si nécessaire
     if (allCats.length === 0) {
         allCats = await getAllCatsFromDB();
     }
-
+    
     // Appliquer les filtres
     const selectedTag = tagFilter ? tagFilter.value : '';
     filteredCats = filterCats(allCats, search, selectedTag);
-
+    
     // Réinitialiser la pagination
     resetPagination();
-
+    
     // Effacer la liste actuelle
     catsList.innerHTML = '';
-
+    
     if (filteredCats.length === 0) {
         emptyState.style.display = 'block';
         catsList.appendChild(emptyState);
         catCount.textContent = '0';
         catsCount.textContent = '0';
-
+        
         // Cacher le bouton "Show More" et l'indicateur
         const showMoreBtn = document.getElementById('showMoreBtn');
         if (showMoreBtn) showMoreBtn.style.display = 'none';
@@ -398,11 +398,11 @@ async function fetchCats(search = '') {
 
     emptyState.style.display = 'none';
     catCount.textContent = filteredCats.length;
-
+    
     // Afficher les chats de la page courante
     const catsToDisplay = getCatsForCurrentPage();
     catsCount.textContent = `${catsToDisplay.length}/${filteredCats.length}`;
-
+    
     catsToDisplay.forEach((cat, index) => {
         const div = document.createElement('div');
         div.classList.add('cat-card');
@@ -427,10 +427,10 @@ async function fetchCats(search = '') {
         `;
         catsList.appendChild(div);
     });
-
+    
     // Afficher/masquer le bouton "Show More"
     updateShowMoreButton();
-
+    
     // Mettre à jour l'indicateur de page
     updatePageIndicator();
 }
@@ -498,7 +498,7 @@ async function editCat(id) {
     document.getElementById('editTag').value = cat.tag;
     document.getElementById('editDesc').value = cat.description;
     document.getElementById('editImg').value = cat.images;
-
+    
     currentCatId = id;
     editModal.classList.add('show');
 
@@ -509,7 +509,7 @@ async function editCat(id) {
             description: document.getElementById('editDesc').value,
             images: document.getElementById('editImg').value
         };
-
+        
         if (!updatedCat.name_cats || !updatedCat.tag || !updatedCat.description || !updatedCat.images) {
             showAlert('Veuillez remplir tous les champs !');
             return;
@@ -523,7 +523,7 @@ async function editCat(id) {
         try {
             await updateCatInDB(id, updatedCat);
             editModal.classList.remove('show');
-
+            
             // Recharger tous les chats après modification
             allCats = await getAllCatsFromDB();
             await fetchCats(searchInput.value);
@@ -558,7 +558,7 @@ searchInput.addEventListener('input', (e) => {
     clearTimeout(searchTimeout);
     if (e.target.value.trim() !== '') formSection.style.display = 'none';
     else formSection.style.display = 'block';
-
+    
     searchTimeout = setTimeout(() => {
         const selectedTag = tagFilter ? tagFilter.value : '';
         fetchCats(e.target.value, selectedTag);
@@ -594,7 +594,7 @@ function showAlert(message, type = 'info') {
     alertMessage.textContent = message;
     const header = alertModal.querySelector('.modal-header');
     const icon = header.querySelector('i');
-
+    
     if (type === 'success') {
         header.style.background = 'linear-gradient(90deg, #10b981, #059669)';
         icon.className = 'fas fa-check-circle';
@@ -605,7 +605,7 @@ function showAlert(message, type = 'info') {
         header.style.background = 'linear-gradient(90deg, var(--primary-color), var(--primary-dark))';
         icon.className = 'fas fa-info-circle';
     }
-
+    
     alertModal.classList.add('show');
 }
 
@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateTagFilter();
     const title = document.querySelector('.header h1');
     if (title) title.style.animation = 'fadeInDown 0.8s ease';
-
+    
     // Ajouter les styles CSS pour la pagination
     addPaginationStyles();
 });
