@@ -3,6 +3,17 @@ export default {
     const url = new URL(request.url);
     const method = request.method;
 
+    // Helper pour extraire l'ID utilisateur du token
+    const getUserIdFromToken = (req) => {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) return null;
+      const token = authHeader.split(' ')[1];
+      if (!token) return null;
+      const tokenParts = token.split('-');
+      if (tokenParts.length < 3 || tokenParts[0] !== 'simple' || tokenParts[1] !== 'token') return null;
+      return tokenParts[2];
+    };
+
     // -----------------------
     // ROUTE GET /api/cats
     // -----------------------
@@ -25,11 +36,16 @@ export default {
         const body = await request.json();
         const { name_cats, tag, description, images } = body;
 
+        const userId = getUserIdFromToken(request);
+        if (!userId) {
+          return new Response(JSON.stringify({ error: "Non autorisé" }), { status: 401 });
+        }
+
         const { lastInsertRowid } = await env.DB
           .prepare(
-            "INSERT INTO cats (name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            "INSERT INTO cats (name_cats, tag, description, images, id_user, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
           )
-          .bind(name_cats, tag, description, images)
+          .bind(name_cats, tag, description, images, userId)
           .run();
 
         const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(lastInsertRowid).all();
@@ -50,6 +66,21 @@ export default {
         const id = url.pathname.split("/").pop();
         const body = await request.json();
         const { name_cats, tag, description, images } = body;
+
+        const userId = getUserIdFromToken(request);
+        if (!userId) {
+          return new Response(JSON.stringify({ error: "Non autorisé" }), { status: 401 });
+        }
+
+        // Vérifier la propriété
+        const { results: existingCats } = await env.DB.prepare("SELECT id_user FROM cats WHERE id=?").bind(id).all();
+        if (existingCats.length === 0) {
+          return new Response(JSON.stringify({ error: "Chat non trouvé" }), { status: 404 });
+        }
+
+        if (existingCats[0].id_user != userId) {
+          return new Response(JSON.stringify({ error: "Vous n'êtes pas autorisé à modifier ce chat" }), { status: 403 });
+        }
 
         await env.DB
           .prepare(
@@ -74,6 +105,21 @@ export default {
     if (url.pathname.startsWith("/api/cats/") && method === "DELETE") {
       try {
         const id = url.pathname.split("/").pop();
+        const userId = getUserIdFromToken(request);
+        if (!userId) {
+          return new Response(JSON.stringify({ error: "Non autorisé" }), { status: 401 });
+        }
+
+        // Vérifier la propriété
+        const { results: existingCats } = await env.DB.prepare("SELECT id_user FROM cats WHERE id=?").bind(id).all();
+        if (existingCats.length === 0) {
+          return new Response(JSON.stringify({ error: "Chat non trouvé" }), { status: 404 });
+        }
+
+        if (existingCats[0].id_user != userId) {
+          return new Response(JSON.stringify({ error: "Vous n'êtes pas autorisé à supprimer ce chat" }), { status: 403 });
+        }
+
         await env.DB.prepare("DELETE FROM cats WHERE id=?").bind(id).run();
         return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
       } catch (err) {
