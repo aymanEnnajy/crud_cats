@@ -1,3 +1,10 @@
+button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    pointer-events: none; /* optionnel mais renforce l'inactivité */
+}
+
 /* Variables et réinitialisation */
 :root {
     --primary-color: #4f46e5;
