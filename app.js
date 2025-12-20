@@ -23,13 +23,13 @@ export default {
     if (url.pathname === "/api/cats" && method === "POST") {
       try {
         const body = await request.json();
-        const { name_cats, tag, description, images } = body;
+        const { id_user, name_cats, tag, description, images } = body;
 
         const { lastInsertRowid } = await env.DB
           .prepare(
-            "INSERT INTO cats (id_user,name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            "INSERT INTO cats (id_user, name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
           )
-          .bind(name_cats, tag, description, images)
+          .bind(id_user, name_cats, tag, description, images)
           .run();
 
         const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(lastInsertRowid).all();
