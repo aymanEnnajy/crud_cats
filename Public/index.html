@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Chats 🐱</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Ajoutez cette div pour contenir la navbar -->
+<div id="navbar-root"></div>
+
+<script src="navbar.js"></script>
+    <header>
+        <!-- Dans votre index.html, ajoutez ceci dans le header -->
+
+    </header>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-paw"></i> Gestion des Chats</h1>
+            <p class="subtitle">Ajoutez, modifiez et supprimez des profils de chats</p>
+        </header>
+
+        <!-- Barre de recherche -->
+        <div class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search" placeholder="Rechercher un chat par nom ou tag...">
+                <div class="search-counter">
+                    <span id="catCount">0</span> chats
+                </div>
+                
+            </div>
+           
+            
+
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <section class="form-section card">
+            <h2><i class="fas fa-plus-circle"></i> Ajouter un nouveau chat</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name_cats"><i class="fas fa-cat"></i> Nom du chat</label>
+                    <input type="text" id="name_cats" placeholder="Ex: Mimi, Luna, Oscar...">
+                </div>
+                <div class="form-group">
+                    <label for="tag"><i class="fas fa-tag"></i> Tag / Race</label>
+                    <input type="text" id="tag" placeholder="Ex: Siamois, Persan, Européen...">
+                </div>
+                <div class="form-group full-width">
+                    <label for="description"><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="description" placeholder="Décrivez le caractère, l'âge, les habitudes..."></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label for="images"><i class="fas fa-link"></i> URL de l'image</label>
+                    <input type="text" id="images" placeholder="https://example.com/chat.jpg">
+                </div>
+            </div>
+            <button id="addBtn" class="btn-primary">
+                <i class="fas fa-plus"></i> Ajouter Chat
+            </button>
+        </section>
+
+        <!-- Liste des chats -->
+        <section class="cats-section">
+            <div style="display: flex; justify-content: space-between;">
+                <h2><i class="fas fa-list"></i> Liste des chats (<span id="catsCount">0</span>)</h2>
+             <select id="tagFilter">
+                <option value="">Tous les tags</option>
+            </select>
+            </div>
+            <div class="cats-list" id="catsList">
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-cat empty-icon"></i>
+                    <h3>Aucun chat trouvé</h3>
+                    <p>Ajoutez votre premier chat en utilisant le formulaire ci-dessus</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmation</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Êtes-vous sûr de vouloir supprimer ce chat ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modalCancel">Annuler</button>
+                <button class="btn-danger" id="modalConfirm">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Modifier le chat</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editName"><i class="fas fa-cat"></i> Nom du chat</label>
+                    <input type="text" id="editName" placeholder="Nom du chat">
+                </div>
+                <div class="form-group">
+                    <label for="editTag"><i class="fas fa-tag"></i> Tag / Race</label>
+                    <input type="text" id="editTag" placeholder="Tag">
+                </div>
+                <div class="form-group">
+                    <label for="editDesc"><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="editDesc" placeholder="Description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editImg"><i class="fas fa-link"></i> URL de l'image</label>
+                    <input type="text" id="editImg" placeholder="URL de l'image">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="editCancel">Annuler</button>
+                <button class="btn-primary" id="editSave">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="alertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Information</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="alertMessage">Veuillez remplir tous les champs</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="alertOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="main.js"></script>
+    <!-- À la fin du body, après vos autres scripts -->
+<script src="auth-check.js"></script>
+</body>
+</html>
