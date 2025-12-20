@@ -271,3 +271,37 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchCats();
 });
 
+// userId = id de l'utilisateur connecté (depuis le token par ex)
+function displayCats(cats, userId) {
+    const catsList = document.getElementById('catsList');
+    catsList.innerHTML = '';
+
+    if (cats.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('emptyState').style.display = 'none';
+    }
+
+    cats.forEach(cat => {
+        const catCard = document.createElement('div');
+        catCard.classList.add('cat-card');
+
+        catCard.innerHTML = `
+            <img src="${cat.images}" alt="${cat.name_cats}">
+            <h3>${cat.name_cats}</h3>
+            <p>${cat.tag}</p>
+            <p>${cat.description}</p>
+            <div class="actions">
+                <button class="btn-edit" data-id="${cat.id}" ${cat.id_user != userId ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                    <i class="fas fa-edit"></i> Modifier
+                </button>
+                <button class="btn-delete" data-id="${cat.id}" ${cat.id_user != userId ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        `;
+
+        catsList.appendChild(catCard);
+    });
+}
