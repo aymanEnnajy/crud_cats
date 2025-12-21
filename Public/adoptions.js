@@ -46,19 +46,23 @@ async function fetchUserAdoptions() {
             div.classList.add('cat-card');
             div.style.animationDelay = `${index * 0.1}s`;
             div.innerHTML = `
-                <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
-                     alt="${cat.name_cats}" 
-                     onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+                <div class="cat-card-image-container">
+                    <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
+                         alt="${cat.name_cats}" 
+                         onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+                    <div class="cat-card-overlay" style="opacity: 1; background: rgba(0,0,0,0.2);">
+                        <span class="adoption-badge-overlay confirmed" style="background: rgba(236, 253, 245, 0.9); color: #059669;">
+                            <i class="fas fa-clock"></i> En attente
+                        </span>
+                    </div>
+                </div>
                 <div class="cat-card-content">
                     <h3>${cat.name_cats}</h3>
                     <div class="cat-tag">${cat.tag}</div>
                     <p>${cat.description}</p>
                     <div class="cat-card-actions">
-                        <span class="adoption-badge confirmed" style="background: #ecfdf5; color: #059669; border: 1px solid #d1fae5;">
-                            <i class="fas fa-clock"></i> En attente
-                        </span>
-                        <button class="btn-danger" onclick="cancelAdoption(${cat.id})">
-                            <i class="fas fa-times"></i> Annuler
+                        <button class="btn-danger" style="width: 100%;" onclick="cancelAdoption(${cat.id})">
+                            <i class="fas fa-times"></i> Annuler l'adoption
                         </button>
                     </div>
                 </div>

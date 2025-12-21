@@ -132,7 +132,7 @@ async function getCatFromDB(id) {
 async function adoptCat(catId) {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        showAlert("Veuillez vous connecter pour adopter un chat", "danger");
+        showAlert("Utilisateur non trouvé. Veuillez vous reconnecter.", "danger");
         return;
     }
 
@@ -151,9 +151,14 @@ async function adoptCat(catId) {
             showAlert("Demande d'adoption envoyée ! Retrouvez-la dans 'Mes Adoptions'.", "success");
             // Recharger pour mettre à jour les boutons
             allCats = await getAllCatsFromDB();
-            await fetchCats(searchInput.value);
+            await fetchCats(searchInput.value || '');
         } else {
-            showAlert(data.error || "Erreur lors de l'adoption", "danger");
+            // Utiliser le message spécifique demandé si c'est un problème d'utilisateur/auth
+            if (res.status === 401) {
+                showAlert("Utilisateur non trouvé. Veuillez vous reconnecter.", "danger");
+            } else {
+                showAlert(data.error || "Erreur lors de l'adoption", "danger");
+            }
         }
     } catch (error) {
         showAlert("Erreur réseau", "danger");
@@ -235,9 +240,22 @@ function displayAdditionalCats(cats) {
         const currentUserId = user.id;
 
         div.innerHTML = `
-            <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
-                 alt="${cat.name_cats}" 
-                 onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+            <div class="cat-card-image-container">
+                <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
+                     alt="${cat.name_cats}" 
+                     onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+                <div class="cat-card-overlay">
+                    ${cat.adoption_status ? `
+                        <span class="adoption-badge-overlay adopted">
+                            <i class="fas fa-check-circle"></i> Déjà réservé
+                        </span>
+                    ` : `
+                        <button class="btn-success-overlay" onclick="adoptCat(${cat.id})">
+                            <i class="fas fa-heart"></i> Adopter
+                        </button>
+                    `}
+                </div>
+            </div>
             <div class="cat-card-content">
                 <h3>${cat.name_cats}</h3>
                 <div class="cat-tag">${cat.tag}</div>
@@ -252,16 +270,6 @@ function displayAdditionalCats(cats) {
                         </button>
                     ` : `
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
-                    `}
-                    
-                    ${cat.adoption_status ? `
-                        <span class="adoption-badge adopted">
-                            <i class="fas fa-check-circle"></i> Déjà réservé
-                        </span>
-                    ` : `
-                        <button class="btn-success" onclick="adoptCat(${cat.id})">
-                            <i class="fas fa-heart"></i> Adopter
-                        </button>
                     `}
                 </div>
             </div>
@@ -468,9 +476,22 @@ async function fetchCats(search = '') {
         div.classList.add('cat-card');
         div.style.animationDelay = `${index * 0.1}s`;
         div.innerHTML = `
-            <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
-                 alt="${cat.name_cats}" 
-                 onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+            <div class="cat-card-image-container">
+                <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
+                     alt="${cat.name_cats}" 
+                     onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+                <div class="cat-card-overlay">
+                    ${cat.adoption_status ? `
+                        <span class="adoption-badge-overlay adopted">
+                            <i class="fas fa-check-circle"></i> Déjà réservé
+                        </span>
+                    ` : `
+                        <button class="btn-success-overlay" onclick="adoptCat(${cat.id})">
+                            <i class="fas fa-heart"></i> Adopter
+                        </button>
+                    `}
+                </div>
+            </div>
             <div class="cat-card-content">
                 <h3>${cat.name_cats}</h3>
                 <div class="cat-tag">${cat.tag}</div>
@@ -485,16 +506,6 @@ async function fetchCats(search = '') {
                         </button>
                     ` : `
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
-                    `}
-
-                    ${cat.adoption_status ? `
-                        <span class="adoption-badge adopted">
-                            <i class="fas fa-check-circle"></i> Déjà réservé
-                        </span>
-                    ` : `
-                        <button class="btn-success" onclick="adoptCat(${cat.id})">
-                            <i class="fas fa-heart"></i> Adopter
-                        </button>
                     `}
                 </div>
             </div>

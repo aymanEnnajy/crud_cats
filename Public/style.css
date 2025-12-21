@@ -574,7 +574,71 @@ button {
     }
 }
 
-/* Adoption Specific Styles */
+/* Overlay et Hover Adoption */
+.cat-card-image-container {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.cat-card-image-container img {
+    border-bottom: none !important;
+    height: 100% !important;
+}
+
+.cat-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition);
+    backdrop-filter: blur(2px);
+}
+
+.cat-card-image-container:hover .cat-card-overlay {
+    opacity: 1;
+}
+
+.btn-success-overlay {
+    background: var(--success-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: 700;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cat-card-image-container:hover .btn-success-overlay {
+    transform: translateY(0);
+}
+
+.btn-success-overlay:hover {
+    background: var(--primary-color);
+    transform: scale(1.1) !important;
+}
+
+.adoption-badge-overlay {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--danger-color);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Adoption Specific Styles (Cleanup) */
 .btn-success {
     background: linear-gradient(90deg, #10b981, #059669);
     color: white;
