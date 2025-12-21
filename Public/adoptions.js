@@ -1,0 +1,108 @@
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUserAdoptions();
+
+    // Fermer la modale d'alerte
+    const alertModal = document.getElementById('alertModal');
+    const alertOk = document.getElementById('alertOk');
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => alertModal.classList.remove('show'));
+    });
+    alertOk.addEventListener('click', () => alertModal.classList.remove('show'));
+});
+
+async function fetchUserAdoptions() {
+    const adoptionsList = document.getElementById('adoptionsList');
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/adoptions', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        adoptionsList.innerHTML = '';
+
+        if (data.length === 0) {
+            adoptionsList.innerHTML = `
+                <div class="no-adoptions" style="grid-column: 1 / -1;">
+                    <i class="fas fa-heart-broken fa-4x" style="color: #cbd5e1; margin-bottom: 20px;"></i>
+                    <h3>Aucune adoption pour le moment</h3>
+                    <p>Parcourez l'accueil pour trouver votre futur compagnon !</p>
+                    <a href="index.html" class="btn-primary" style="display: inline-flex; margin-top: 20px; text-decoration: none;">
+                        <i class="fas fa-search"></i> Voir les chats
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
+        data.forEach((cat, index) => {
+            const div = document.createElement('div');
+            div.classList.add('cat-card');
+            div.style.animationDelay = `${index * 0.1}s`;
+            div.innerHTML = `
+                <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
+                     alt="${cat.name_cats}" 
+                     onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
+                <div class="cat-card-content">
+                    <h3>${cat.name_cats}</h3>
+                    <div class="cat-tag">${cat.tag}</div>
+                    <p>${cat.description}</p>
+                    <div class="cat-card-actions">
+                        <span class="adoption-badge confirmed" style="background: #ecfdf5; color: #059669; border: 1px solid #d1fae5;">
+                            <i class="fas fa-clock"></i> En attente
+                        </span>
+                        <button class="btn-danger" onclick="cancelAdoption(${cat.id})">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            adoptionsList.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert("Erreur lors du chargement de vos adoptions", "danger");
+    }
+}
+
+async function cancelAdoption(catId) {
+    const token = localStorage.getItem('authToken');
+    try {
+        const res = await fetch(`/api/adoptions/${catId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            showAlert("Adoption annulée avec succès", "success");
+            fetchUserAdoptions();
+        } else {
+            showAlert("Erreur lors de l'annulation", "danger");
+        }
+    } catch (error) {
+        showAlert("Erreur réseau", "danger");
+    }
+}
+
+function showAlert(message, type = 'info') {
+    const alertModal = document.getElementById('alertModal');
+    const alertMessage = document.getElementById('alertMessage');
+    alertMessage.textContent = message;
+
+    const header = alertModal.querySelector('.modal-header');
+    if (type === 'success') {
+        header.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+    } else if (type === 'danger') {
+        header.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
+    } else {
+        header.style.background = 'linear-gradient(90deg, var(--primary-color), var(--primary-dark))';
+    }
+
+    alertModal.classList.add('show');
+}

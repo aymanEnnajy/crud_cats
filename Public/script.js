@@ -128,6 +128,38 @@ async function getCatFromDB(id) {
     return cats.find(cat => cat.id === id);
 }
 
+// Adopter un chat
+async function adoptCat(catId) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        showAlert("Veuillez vous connecter pour adopter un chat", "danger");
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/adoptions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cat_id: catId })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            showAlert("Demande d'adoption envoyée ! Retrouvez-la dans 'Mes Adoptions'.", "success");
+            // Recharger pour mettre à jour les boutons
+            allCats = await getAllCatsFromDB();
+            await fetchCats(searchInput.value);
+        } else {
+            showAlert(data.error || "Erreur lors de l'adoption", "danger");
+        }
+    } catch (error) {
+        showAlert("Erreur réseau", "danger");
+    }
+}
+
 // ============================================
 // FONCTIONS DE PAGINATION
 // ============================================
@@ -219,6 +251,15 @@ function displayAdditionalCats(cats) {
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     ` : `
+                        ${cat.adoption_status ? `
+                            <span class="adoption-badge adopted">
+                                <i class="fas fa-check-circle"></i> Déjà réservé
+                            </span>
+                        ` : `
+                            <button class="btn-success" onclick="adoptCat(${cat.id})">
+                                <i class="fas fa-heart"></i> Adopter
+                            </button>
+                        `}
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
                     `}
                 </div>
@@ -442,6 +483,15 @@ async function fetchCats(search = '') {
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     ` : `
+                        ${cat.adoption_status ? `
+                            <span class="adoption-badge adopted">
+                                <i class="fas fa-check-circle"></i> Déjà réservé
+                            </span>
+                        ` : `
+                            <button class="btn-success" onclick="adoptCat(${cat.id})">
+                                <i class="fas fa-heart"></i> Adopter
+                            </button>
+                        `}
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
                     `}
                 </div>
@@ -658,86 +708,121 @@ document.addEventListener('DOMContentLoaded', () => {
 function addPaginationStyles() {
     const style = document.createElement('style');
     style.textContent = `
-        /* Styles pour la pagination */
-        .end-message {
-            background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
-            border: 1px solid #bae6fd;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px auto;
-            max-width: 400px;
-            text-align: center;
-            color: #0369a1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            animation: fadeInUp 0.5s ease;
-        }
+            /* Styles pour la pagination */
+            .end - message {
+                background: linear - gradient(90deg, #f0f9ff, #e0f2fe);
+                border: 1px solid #bae6fd;
+                border- radius: 12px;
+    padding: 20px;
+    margin: 30px auto;
+    max - width: 400px;
+    text - align: center;
+    color: #0369a1;
+    display: flex;
+    align - items: center;
+    justify - content: center;
+    gap: 15px;
+    animation: fadeInUp 0.5s ease;
+}
         
-        .end-message i {
-            font-size: 1.5rem;
-            color: #0ea5e9;
-        }
+        .end - message i {
+    font - size: 1.5rem;
+    color: #0ea5e9;
+}
         
-        .end-message span {
-            font-weight: 500;
-            font-size: 1rem;
-        }
+        .end - message span {
+    font - weight: 500;
+    font - size: 1rem;
+}
         
-        .page-indicator {
-            background: var(--light-color);
-            padding: 12px 25px;
-            border-radius: 25px;
-            border: 2px solid var(--light-gray);
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.95rem;
-            color: var(--gray-color);
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
+        .page - indicator {
+    background: var(--light - color);
+    padding: 12px 25px;
+    border - radius: 25px;
+    border: 2px solid var(--light - gray);
+    display: inline - flex;
+    align - items: center;
+    gap: 15px;
+    font - size: 0.95rem;
+    color: var(--gray - color);
+    margin: 20px 0;
+    box - shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
         
-        .page-indicator strong {
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-        
-        #showMoreBtn {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #showMoreBtn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
-        }
-        
-        #showMoreBtn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        @keyframes fadeInUp {
+        .page - indicator strong {
+    color: var(--primary - color);
+    font - weight: 700;
+}
+
+#showMoreBtn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#showMoreBtn:hover {
+    transform: translateY(-3px);
+    box - shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+}
+
+#showMoreBtn:disabled {
+    opacity: 0.7;
+    cursor: not - allowed;
+    transform: none!important;
+}
+
+@keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
+}
 
-        .owner-only-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #f1f5f9;
-            color: #64748b;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: 1px solid #e2e8f0;
-        }
-    `;
+        .owner - only - badge {
+    display: inline - flex;
+    align - items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f1f5f9;
+    color: #64748b;
+    border - radius: 20px;
+    font - size: 0.85rem;
+    font - weight: 500;
+    border: 1px solid #e2e8f0;
+}
+
+        .btn - success {
+    background: linear - gradient(90deg, #10b981, #059669);
+    color: white;
+    padding: 8px 16px;
+    border - radius: 8px;
+    border: none;
+    cursor: pointer;
+    font - weight: 500;
+    display: inline - flex;
+    align - items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+        .btn - success:hover {
+    transform: translateY(-2px);
+    box - shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+        .adoption - badge {
+    display: inline - flex;
+    align - items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border - radius: 20px;
+    font - size: 0.85rem;
+    font - weight: 600;
+}
+
+        .adoption - badge.adopted {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+}
+`;
     document.head.appendChild(style);
 }

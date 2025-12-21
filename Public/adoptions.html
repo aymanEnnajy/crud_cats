@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Adoptions 🐱</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .adoptions-container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .adoptions-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .adoptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .no-adoptions {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-root"></div>
+    <script src="navbar.js"></script>
+
+    <div class="adoptions-container">
+        <header class="adoptions-header">
+            <h1><i class="fas fa-heart"></i> Mes Adoptions</h1>
+            <p class="subtitle">Retrouvez ici les chats que vous avez choisi d'adopter</p>
+        </header>
+
+        <div id="adoptionsList" class="adoptions-grid">
+            <!-- Les adoptions seront chargées ici -->
+             <div class="no-adoptions" id="loadingState">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary-color);"></i>
+                <p style="margin-top: 20px;">Chargement de vos adoptions...</p>
+             </div>
+        </div>
+    </div>
+
+    <!-- Modale d'alerte (copiée de index.html pour cohérence) -->
+    <div class="modal" id="alertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Information</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="alertMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="alertOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="adoptions.js"></script>
+    <script src="auth-check.js"></script>
+</body>
+</html>

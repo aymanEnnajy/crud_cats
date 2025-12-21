@@ -2,7 +2,8 @@ button:disabled {
     background-color: #ccc;
     color: #666;
     cursor: not-allowed;
-    pointer-events: none; /* optionnel mais renforce l'inactivité */
+    pointer-events: none;
+    /* optionnel mais renforce l'inactivité */
 }
 
 /* Variables et réinitialisation */
@@ -177,9 +178,11 @@ body {
         background-position: right 14px center;
     }
 }
-#tagFilter{
+
+#tagFilter {
     height: 8vh;
 }
+
 /* Formulaire */
 .form-section h2 {
     font-size: 1.8rem;
@@ -369,7 +372,8 @@ button {
 }
 
 /* État vide */
-.empty-state, .error-state {
+.empty-state,
+.error-state {
     grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
@@ -378,7 +382,8 @@ button {
     box-shadow: var(--box-shadow);
 }
 
-.empty-state i, .error-state i {
+.empty-state i,
+.error-state i {
     font-size: 4rem;
     color: var(--light-gray);
     margin-bottom: 20px;
@@ -388,13 +393,15 @@ button {
     color: var(--danger-color);
 }
 
-.empty-state h3, .error-state h3 {
+.empty-state h3,
+.error-state h3 {
     font-size: 1.8rem;
     margin-bottom: 10px;
     color: var(--dark-color);
 }
 
-.empty-state p, .error-state p {
+.empty-state p,
+.error-state p {
     color: var(--gray-color);
     font-size: 1.1rem;
     margin-bottom: 20px;
@@ -478,6 +485,7 @@ button {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -489,7 +497,7 @@ button {
     .form-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .form-group.full-width {
         grid-column: span 1;
     }
@@ -499,19 +507,19 @@ button {
     .header h1 {
         font-size: 2.2rem;
     }
-    
+
     .card {
         padding: 20px;
     }
-    
+
     #catsList {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
+
     .modal-footer {
         flex-direction: column;
     }
-    
+
     .modal-footer button {
         width: 100%;
     }
@@ -521,21 +529,21 @@ button {
     body {
         padding: 15px 10px;
     }
-    
+
     .header h1 {
         font-size: 1.8rem;
         flex-direction: column;
         gap: 5px;
     }
-    
+
     #catsList {
         grid-template-columns: 1fr;
     }
-    
+
     .cat-card-actions {
         flex-direction: column;
     }
-    
+
     .search-counter {
         position: static;
         margin-top: 30px;
@@ -545,20 +553,70 @@ button {
 }
 
 /* Ajoutez ceci dans le style de chaque page */
-.navbar{
+.navbar {
     margin-top: 0px !important;
     width: 100vw !important;
     margin-left: 0px;
 }
+
 @media (max-width:767px) {
-    .navbar{
+    .navbar {
         margin-left: 0px;
     }
-    #search{
+
+    #search {
         width: 86vw;
         font-size: 0.9rem;
     }
-    .search-icon{
-        top:25%;
+
+    .search-icon {
+        top: 25%;
     }
+}
+
+/* Adoption Specific Styles */
+.btn-success {
+    background: linear-gradient(90deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(90deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.adoption-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.adoption-badge.adopted {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+}
+
+.adoption-badge.confirmed {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #d1fae5;
+}
+
+.owner-only-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
 }

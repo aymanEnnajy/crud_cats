@@ -45,6 +45,12 @@ class NavbarManager {
                                 <i class="fas fa-home"></i>
                                 <span>Accueil</span>
                             </a>
+                            ${this.user && this.token ? `
+                            <a href="adoptions.html" class="nav-link">
+                                <i class="fas fa-heart"></i>
+                                <span>Mes Adoptions</span>
+                            </a>
+                            ` : ''}
                             <a href="about.html" class="nav-link">
                                 <i class="fas fa-info-circle"></i>
                                 <span>À Propos</span>
@@ -441,19 +447,19 @@ class NavbarManager {
             .nav-link:nth-child(2) { animation-delay: 0.2s; }
             .nav-link:nth-child(3) { animation-delay: 0.3s; }
         `;
-        
+
         document.head.appendChild(style);
     }
 
     setupMobileMenu() {
         const navToggle = document.getElementById('navToggle');
         const navMenu = document.getElementById('navMenu');
-        
+
         if (navToggle && navMenu) {
             navToggle.addEventListener('click', () => {
                 navMenu.classList.toggle('active');
-                navToggle.innerHTML = navMenu.classList.contains('active') 
-                    ? '<i class="fas fa-times"></i>' 
+                navToggle.innerHTML = navMenu.classList.contains('active')
+                    ? '<i class="fas fa-times"></i>'
                     : '<i class="fas fa-bars"></i>';
             });
 
@@ -499,7 +505,7 @@ class NavbarManager {
         // Supprimer les données d'authentification
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        
+
         // Rediriger vers la page de login
         window.location.href = 'login.html';
     }
