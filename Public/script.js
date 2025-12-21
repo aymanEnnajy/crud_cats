@@ -251,16 +251,17 @@ function displayAdditionalCats(cats) {
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     ` : `
-                        ${cat.adoption_status ? `
-                            <span class="adoption-badge adopted">
-                                <i class="fas fa-check-circle"></i> Déjà réservé
-                            </span>
-                        ` : `
-                            <button class="btn-success" onclick="adoptCat(${cat.id})">
-                                <i class="fas fa-heart"></i> Adopter
-                            </button>
-                        `}
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
+                    `}
+                    
+                    ${cat.adoption_status ? `
+                        <span class="adoption-badge adopted">
+                            <i class="fas fa-check-circle"></i> Déjà réservé
+                        </span>
+                    ` : `
+                        <button class="btn-success" onclick="adoptCat(${cat.id})">
+                            <i class="fas fa-heart"></i> Adopter
+                        </button>
                     `}
                 </div>
             </div>
@@ -483,16 +484,17 @@ async function fetchCats(search = '') {
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     ` : `
-                        ${cat.adoption_status ? `
-                            <span class="adoption-badge adopted">
-                                <i class="fas fa-check-circle"></i> Déjà réservé
-                            </span>
-                        ` : `
-                            <button class="btn-success" onclick="adoptCat(${cat.id})">
-                                <i class="fas fa-heart"></i> Adopter
-                            </button>
-                        `}
                         <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
+                    `}
+
+                    ${cat.adoption_status ? `
+                        <span class="adoption-badge adopted">
+                            <i class="fas fa-check-circle"></i> Déjà réservé
+                        </span>
+                    ` : `
+                        <button class="btn-success" onclick="adoptCat(${cat.id})">
+                            <i class="fas fa-heart"></i> Adopter
+                        </button>
                     `}
                 </div>
             </div>

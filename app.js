@@ -275,6 +275,12 @@ export default {
         const token = authHeader.split(' ')[1];
         const userId = token.split('-')[2];
 
+        // Vérifier si l'utilisateur existe (pour éviter D1_ERROR: FOREIGN KEY constraint failed)
+        const { results: userExists } = await env.DB.prepare("SELECT id FROM users WHERE id = ?").bind(userId).all();
+        if (userExists.length === 0) {
+          return new Response(JSON.stringify({ error: "Utilisateur non trouvé. Veuillez vous reconnecter." }), { status: 401 });
+        }
+
         // Vérifier si déjà adopté par quelqu'un d'autre
         const { results: existing } = await env.DB.prepare("SELECT id FROM adoptions WHERE cat_id = ?").bind(cat_id).all();
         if (existing.length > 0) {
