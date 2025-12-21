@@ -101,9 +101,13 @@ async function addCatToDB(cat) {
 
 // Modifier un chat
 async function updateCatInDB(id, cat) {
+    const token = localStorage.getItem('authToken');
     const res = await fetch(`/api/cats/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(cat)
     });
     return await res.json();
@@ -111,7 +115,11 @@ async function updateCatInDB(id, cat) {
 
 // Supprimer un chat
 async function deleteCatFromDB(id) {
-    await fetch(`/api/cats/${id}`, { method: 'DELETE' });
+    const token = localStorage.getItem('authToken');
+    await fetch(`/api/cats/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
 }
 
 // Récupérer un chat par ID
@@ -191,6 +199,9 @@ function displayAdditionalCats(cats) {
         const div = document.createElement('div');
         div.classList.add('cat-card');
         div.style.animationDelay = `${index * 0.1}s`;
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const currentUserId = user.id;
+
         div.innerHTML = `
             <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
                  alt="${cat.name_cats}" 
@@ -200,12 +211,16 @@ function displayAdditionalCats(cats) {
                 <div class="cat-tag">${cat.tag}</div>
                 <p>${cat.description}</p>
                 <div class="cat-card-actions">
-                    <button class="btn-primary" onclick="editCat(${cat.id})">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
-                    <button class="btn-danger" onclick="deleteCat(${cat.id})">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
+                    ${cat.id_user == currentUserId ? `
+                        <button class="btn-primary" onclick="editCat(${cat.id})">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button class="btn-danger" onclick="deleteCat(${cat.id})">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    ` : `
+                        <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
+                    `}
                 </div>
             </div>
         `;
@@ -403,6 +418,9 @@ async function fetchCats(search = '') {
     const catsToDisplay = getCatsForCurrentPage();
     catsCount.textContent = `${catsToDisplay.length}/${filteredCats.length}`;
 
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = user.id;
+
     catsToDisplay.forEach((cat, index) => {
         const div = document.createElement('div');
         div.classList.add('cat-card');
@@ -416,12 +434,16 @@ async function fetchCats(search = '') {
                 <div class="cat-tag">${cat.tag}</div>
                 <p>${cat.description}</p>
                 <div class="cat-card-actions">
-                    <button class="btn-primary" onclick="editCat(${cat.id})">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
-                    <button class="btn-danger" onclick="deleteCat(${cat.id})">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
+                    ${cat.id_user == currentUserId ? `
+                        <button class="btn-primary" onclick="editCat(${cat.id})">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button class="btn-danger" onclick="deleteCat(${cat.id})">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    ` : `
+                        <span class="owner-only-badge"><i class="fas fa-lock"></i> Consultable</span>
+                    `}
                 </div>
             </div>
         `;
@@ -702,6 +724,19 @@ function addPaginationStyles() {
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .owner-only-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
         }
     `;
     document.head.appendChild(style);
