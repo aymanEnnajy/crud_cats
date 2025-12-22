@@ -152,6 +152,10 @@ async function adoptCat(catId) {
             // Recharger pour mettre à jour les boutons
             allCats = await getAllCatsFromDB();
             await fetchCats(searchInput.value || '');
+            // Mettre à jour le badge de la navbar
+            if (window.navbarManager) {
+                window.navbarManager.updateAdoptionCount();
+            }
         } else {
             // Utiliser le message spécifique demandé si c'est un problème d'utilisateur/auth
             if (res.status === 401) {

@@ -123,6 +123,10 @@ async function cancelAdoption(catId) {
         if (res.ok) {
             showAlert("Adoption annulée avec succès", "success");
             fetchUserAdoptions();
+            // Mettre à jour le badge de la navbar
+            if (window.navbarManager) {
+                window.navbarManager.updateAdoptionCount();
+            }
         } else {
             showAlert("Erreur lors de l'annulation", "danger");
         }

@@ -13,6 +13,9 @@ class NavbarManager {
         this.updateAuthUI();
         this.setupMobileMenu();
         this.setActiveLink();
+        if (this.user && this.token) {
+            this.updateAdoptionCount();
+        }
     }
 
     async loadNavbar() {
@@ -49,6 +52,7 @@ class NavbarManager {
                             <a href="adoptions.html" class="nav-link">
                                 <i class="fas fa-heart"></i>
                                 <span>Mes Adoptions</span>
+                                <span id="adoptionBadge" class="nav-badge" style="display: none;">0</span>
                             </a>
                             ` : ''}
                             <a href="about.html" class="nav-link">
@@ -332,6 +336,32 @@ class NavbarManager {
                 background: #fee2e2;
             }
 
+            /* Badge Styles */
+            .nav-badge {
+                position: absolute;
+                top: -5px;
+                right: -12px;
+                background: #ef4444;
+                color: white;
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-weight: 700;
+                min-width: 18px;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
+                border: 2px solid white;
+            }
+
+            @media (max-width: 768px) {
+                .nav-badge {
+                    position: static;
+                    margin-left: 10px;
+                    border: none;
+                    box-shadow: none;
+                }
+            }
+
             /* Bouton hamburger (mobile) */
             .nav-toggle {
                 display: none;
@@ -515,6 +545,29 @@ class NavbarManager {
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
         this.token = localStorage.getItem('authToken');
         this.updateAuthUI();
+        if (this.user && this.token) {
+            this.updateAdoptionCount();
+        }
+    }
+
+    async updateAdoptionCount() {
+        if (!this.user || !this.token) return;
+        try {
+            const res = await fetch('/api/adoptions', {
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const count = data.length;
+                const badge = document.getElementById('adoptionBadge');
+                if (badge) {
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'inline-block' : 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du badge:', error);
+        }
     }
 }
 
