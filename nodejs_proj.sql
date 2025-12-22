@@ -1,6 +1,7 @@
 -- Converted for Cloudflare D1 (SQLite)
 
 -- 1. Drop child tables first to avoid FK constraints
+DROP TABLE IF EXISTS user_sessions;
 DROP TABLE IF EXISTS adoptions;
 DROP TABLE IF EXISTS cats;
 DROP TABLE IF EXISTS users;
@@ -50,4 +51,13 @@ CREATE TABLE IF NOT EXISTS adoptions (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (cat_id) REFERENCES cats(id)
+);
+
+-- 5. Create user_sessions table
+CREATE TABLE IF NOT EXISTS user_sessions (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
