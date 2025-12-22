@@ -15,12 +15,17 @@ export default {
       const sessionId = getCookie("session_id");
       if (!sessionId) return null;
 
-      const { results } = await env.DB.prepare(
-        "SELECT user_id FROM user_sessions WHERE id = ? AND expires_at > CURRENT_TIMESTAMP"
-      ).bind(sessionId).all();
+      try {
+        const { results } = await env.DB.prepare(
+          "SELECT user_id FROM user_sessions WHERE id = ? AND expires_at > CURRENT_TIMESTAMP"
+        ).bind(sessionId).all();
 
-      if (results.length === 0) return null;
-      return results[0].user_id;
+        if (results.length === 0) return null;
+        return results[0].user_id;
+      } catch (e) {
+        console.error("Error in getSession (maybe table missing?):", e.message);
+        return null;
+      }
     };
 
     // -----------------------
@@ -152,15 +157,21 @@ export default {
           .bind(username, email, password)
           .run();
         console.log("User registered with rowid:", lastInsertRowid);
+
         const sessionId = crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
-        // Supprimer les anciennes sessions de l'utilisateur
-        await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(lastInsertRowid).run();
+        // Supprimer les anciennes sessions
+        try {
+          await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(lastInsertRowid).run();
+        } catch (e) {
+          console.error("Failed to delete old sessions:", e.message);
+        }
 
+        console.log("Attempting to insert session for user:", lastInsertRowid);
         await env.DB.prepare(
-          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, ?)"
-        ).bind(sessionId, lastInsertRowid, expiresAt).run();
+          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
+        ).bind(sessionId, lastInsertRowid).run();
+        console.log("Session inserted successfully");
 
         return new Response(
           JSON.stringify({
@@ -203,14 +214,19 @@ export default {
 
         const user = users[0];
         const sessionId = crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
-        // Supprimer les anciennes sessions de l'utilisateur
-        await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(user.id).run();
+        // Supprimer les anciennes sessions
+        try {
+          await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(user.id).run();
+        } catch (e) {
+          console.error("Failed to delete old sessions in login:", e.message);
+        }
 
+        console.log("Attempting to insert session for user:", user.id);
         await env.DB.prepare(
-          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, ?)"
-        ).bind(sessionId, user.id, expiresAt).run();
+          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
+        ).bind(sessionId, user.id).run();
+        console.log("Session inserted successfully for login");
 
         return new Response(
           JSON.stringify({ message: "Connexion réussie", user: { id: user.id, username: user.username, email: user.email } }),
