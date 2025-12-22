@@ -152,6 +152,9 @@ export default {
         const sessionId = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
+        // Supprimer les anciennes sessions de l'utilisateur
+        await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(lastInsertRowid).run();
+
         await env.DB.prepare(
           "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, ?)"
         ).bind(sessionId, lastInsertRowid, expiresAt).run();
@@ -161,12 +164,12 @@ export default {
             message: "Inscription réussie",
             user: { id: lastInsertRowid, username, email }
           }),
-          { 
-            status: 201, 
-            headers: { 
+          {
+            status: 201,
+            headers: {
               "Content-Type": "application/json",
               "Set-Cookie": `session_id=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}`
-            } 
+            }
           }
         );
       } catch (err) {
@@ -199,17 +202,20 @@ export default {
         const sessionId = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
+        // Supprimer les anciennes sessions de l'utilisateur
+        await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(user.id).run();
+
         await env.DB.prepare(
           "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, ?)"
         ).bind(sessionId, user.id, expiresAt).run();
 
         return new Response(
           JSON.stringify({ message: "Connexion réussie", user: { id: user.id, username: user.username, email: user.email } }),
-          { 
-            headers: { 
+          {
+            headers: {
               "Content-Type": "application/json",
               "Set-Cookie": `session_id=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}`
-            } 
+            }
           }
         );
       } catch (err) {
@@ -256,11 +262,11 @@ export default {
       return new Response(JSON.stringify({
         message: 'Déconnexion réussie',
         success: true
-      }), { 
-        headers: { 
+      }), {
+        headers: {
           "Content-Type": "application/json",
           "Set-Cookie": "session_id=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0"
-        } 
+        }
       });
     }
 
