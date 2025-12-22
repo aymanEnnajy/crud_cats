@@ -101,12 +101,10 @@ async function addCatToDB(cat) {
 
 // Modifier un chat
 async function updateCatInDB(id, cat) {
-    const token = localStorage.getItem('authToken');
     const res = await fetch(`/api/cats/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(cat)
     });
@@ -115,10 +113,8 @@ async function updateCatInDB(id, cat) {
 
 // Supprimer un chat
 async function deleteCatFromDB(id) {
-    const token = localStorage.getItem('authToken');
     await fetch(`/api/cats/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: 'DELETE'
     });
 }
 
@@ -130,18 +126,11 @@ async function getCatFromDB(id) {
 
 // Adopter un chat
 async function adoptCat(catId) {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        showAlert("Utilisateur non trouvé. Veuillez vous reconnecter.", "danger");
-        return;
-    }
-
     try {
         const res = await fetch('/api/adoptions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ cat_id: catId })
         });
@@ -541,11 +530,6 @@ addBtn.addEventListener('click', async () => {
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const id_user = user.id;
-
-    if (!id_user) {
-        showAlert("Session expirée. Veuillez vous reconnecter.", "danger");
-        return;
-    }
 
     const newCat = {
         id_user: id_user,

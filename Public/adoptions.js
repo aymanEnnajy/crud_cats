@@ -12,17 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchUserAdoptions() {
     const adoptionsList = document.getElementById('adoptionsList');
-    const token = localStorage.getItem('authToken');
-
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
 
     try {
-        const res = await fetch('/api/adoptions', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch('/api/adoptions');
+        if (res.status === 401) {
+            window.location.href = 'login.html';
+            return;
+        }
         const data = await res.json();
 
         adoptionsList.innerHTML = '';
@@ -90,12 +86,10 @@ async function fetchUserAdoptions() {
 }
 
 async function confirmAdoption(catId) {
-    const token = localStorage.getItem('authToken');
     try {
         const res = await fetch(`/api/adoptions/${catId}/status`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ status: 'confirmed' })
@@ -113,11 +107,9 @@ async function confirmAdoption(catId) {
 }
 
 async function cancelAdoption(catId) {
-    const token = localStorage.getItem('authToken');
     try {
         const res = await fetch(`/api/adoptions/${catId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            method: 'DELETE'
         });
 
         if (res.ok) {

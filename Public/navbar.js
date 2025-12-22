@@ -3,7 +3,6 @@
 class NavbarManager {
     constructor() {
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
-        this.token = localStorage.getItem('authToken');
         this.init();
     }
 
@@ -13,7 +12,7 @@ class NavbarManager {
         this.updateAuthUI();
         this.setupMobileMenu();
         this.setActiveLink();
-        if (this.user && this.token) {
+        if (this.user) {
             this.updateAdoptionCount();
         }
     }
@@ -48,7 +47,7 @@ class NavbarManager {
                                 <i class="fas fa-home"></i>
                                 <span>Accueil</span>
                             </a>
-                            ${this.user && this.token ? `
+                            ${this.user ? `
                             <a href="adoptions.html" class="nav-link">
                                 <i class="fas fa-heart"></i>
                                 <span>Mes Adoptions</span>
@@ -79,7 +78,7 @@ class NavbarManager {
     }
 
     getAuthHTML() {
-        if (this.user && this.token) {
+        if (this.user) {
             // Utilisateur connecté
             return `
                 <div class="user-nav-info">
@@ -531,31 +530,29 @@ class NavbarManager {
         }
     }
 
-    logout() {
-        // Supprimer les données d'authentification
-        localStorage.removeItem('authToken');
+    async logout() {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
         localStorage.removeItem('user');
-
-        // Rediriger vers la page de login
         window.location.href = 'login.html';
     }
 
     // Méthode pour forcer la mise à jour de la navbar
     updateUserInfo() {
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
-        this.token = localStorage.getItem('authToken');
         this.updateAuthUI();
-        if (this.user && this.token) {
+        if (this.user) {
             this.updateAdoptionCount();
         }
     }
 
     async updateAdoptionCount() {
-        if (!this.user || !this.token) return;
+        if (!this.user) return;
         try {
-            const res = await fetch('/api/adoptions', {
-                headers: { 'Authorization': `Bearer ${this.token}` }
-            });
+            const res = await fetch('/api/adoptions');
             if (res.ok) {
                 const data = await res.json();
                 const count = data.length;
