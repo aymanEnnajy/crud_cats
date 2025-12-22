@@ -59,15 +59,17 @@ export default {
         const { name_cats, tag, description, images } = body;
 
         console.log("Attempting to insert cat:", { userId, name_cats, tag, description, images });
-        const { lastInsertRowid } = await env.DB
+        const result = await env.DB
           .prepare(
             "INSERT INTO cats (id_user, name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
           )
           .bind(userId, name_cats, tag, description, images)
           .run();
-        console.log("Cat inserted with rowid:", lastInsertRowid);
 
-        const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(lastInsertRowid).all();
+        const catId = result.meta.last_row_id;
+        console.log("Cat inserted with id:", catId);
+
+        const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(catId).all();
 
         return new Response(JSON.stringify(results[0]), {
           headers: { "Content-Type": "application/json" }
@@ -152,31 +154,33 @@ export default {
         }
 
         console.log("Attempting to register user:", { username, email });
-        const { lastInsertRowid } = await env.DB
+        const userResult = await env.DB
           .prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)")
           .bind(username, email, password)
           .run();
-        console.log("User registered with rowid:", lastInsertRowid);
+
+        const newUserId = userResult.meta.last_row_id;
+        console.log("User registered with id:", newUserId);
 
         const sessionId = crypto.randomUUID();
 
         // Supprimer les anciennes sessions
         try {
-          await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(lastInsertRowid).run();
+          await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(newUserId).run();
         } catch (e) {
           console.error("Failed to delete old sessions:", e.message);
         }
 
-        console.log("Attempting to insert session for user:", lastInsertRowid);
+        console.log("Attempting to insert session for user:", newUserId);
         await env.DB.prepare(
           "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
-        ).bind(sessionId, lastInsertRowid).run();
+        ).bind(sessionId, newUserId).run();
         console.log("Session inserted successfully");
 
         return new Response(
           JSON.stringify({
             message: "Inscription réussie",
-            user: { id: lastInsertRowid, username, email }
+            user: { id: newUserId, username, email }
           }),
           {
             status: 201,
