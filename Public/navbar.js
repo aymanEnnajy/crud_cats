@@ -572,11 +572,6 @@ class NavbarManager {
 }
 
 // Initialiser la navbar
-let navbarManager;
-
 document.addEventListener('DOMContentLoaded', () => {
-    navbarManager = new NavbarManager();
+    window.navbarManager = new NavbarManager();
 });
-
-// Exposer la navbarManager globalement
-window.navbarManager = navbarManager;
