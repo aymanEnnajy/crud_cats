@@ -42,17 +42,26 @@ async function fetchUserAdoptions() {
         }
 
         data.forEach((cat, index) => {
+            const isConfirmed = cat.adoption_status === 'confirmed';
             const div = document.createElement('div');
             div.classList.add('cat-card');
             div.style.animationDelay = `${index * 0.1}s`;
+
+            // Badge style based on status
+            const badgeText = isConfirmed ? 'Adopté' : 'En attente';
+            const badgeClass = isConfirmed ? 'confirmed' : 'pending';
+            const badgeStyle = isConfirmed
+                ? 'background: rgba(236, 253, 245, 0.9); color: #059669;'
+                : 'background: rgba(254, 243, 199, 0.9); color: #d97706;';
+
             div.innerHTML = `
                 <div class="cat-card-image-container">
                     <img src="${cat.images || 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'}" 
                          alt="${cat.name_cats}" 
                          onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
                     <div class="cat-card-overlay" style="opacity: 1; background: rgba(0,0,0,0.2);">
-                        <span class="adoption-badge-overlay confirmed" style="background: rgba(236, 253, 245, 0.9); color: #059669;">
-                            <i class="fas fa-clock"></i> En attente
+                        <span class="adoption-badge-overlay ${badgeClass}" style="${badgeStyle}">
+                            <i class="fas ${isConfirmed ? 'fa-check-circle' : 'fa-clock'}"></i> ${badgeText}
                         </span>
                     </div>
                 </div>
@@ -60,9 +69,14 @@ async function fetchUserAdoptions() {
                     <h3>${cat.name_cats}</h3>
                     <div class="cat-tag">${cat.tag}</div>
                     <p>${cat.description}</p>
-                    <div class="cat-card-actions">
+                    <div class="cat-card-actions" style="display: flex; gap: 10px; flex-direction: column;">
+                        ${!isConfirmed ? `
+                        <button class="btn-primary" style="width: 100%;" onclick="confirmAdoption(${cat.id})">
+                            <i class="fas fa-check"></i> Confirmer l'adoption
+                        </button>
+                        ` : ''}
                         <button class="btn-danger" style="width: 100%;" onclick="cancelAdoption(${cat.id})">
-                            <i class="fas fa-times"></i> Annuler l'adoption
+                            <i class="fas fa-times"></i> ${isConfirmed ? 'Annuler et libérer' : "Annuler l'adoption"}
                         </button>
                     </div>
                 </div>
@@ -72,6 +86,29 @@ async function fetchUserAdoptions() {
     } catch (error) {
         console.error('Erreur:', error);
         showAlert("Erreur lors du chargement de vos adoptions", "danger");
+    }
+}
+
+async function confirmAdoption(catId) {
+    const token = localStorage.getItem('authToken');
+    try {
+        const res = await fetch(`/api/adoptions/${catId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'confirmed' })
+        });
+
+        if (res.ok) {
+            showAlert("Adoption confirmée ! Le chat est maintenant à vous.", "success");
+            fetchUserAdoptions();
+        } else {
+            showAlert("Erreur lors de la confirmation", "danger");
+        }
+    } catch (error) {
+        showAlert("Erreur réseau", "danger");
     }
 }
 

@@ -245,9 +245,13 @@ function displayAdditionalCats(cats) {
                      alt="${cat.name_cats}" 
                      onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
                 <div class="cat-card-overlay">
-                    ${cat.adoption_status ? `
-                        <span class="adoption-badge-overlay adopted">
-                            <i class="fas fa-check-circle"></i> Déjà réservé
+                    ${cat.adoption_status === 'confirmed' ? `
+                        <span class="adoption-badge-overlay confirmed" style="background: rgba(16, 185, 129, 0.9); color: white;">
+                            <i class="fas fa-check-circle"></i> Adopté
+                        </span>
+                    ` : cat.adoption_status === 'pending' ? `
+                        <span class="adoption-badge-overlay pending" style="background: rgba(245, 158, 11, 0.9); color: white;">
+                            <i class="fas fa-clock"></i> Réservé
                         </span>
                     ` : `
                         <button class="btn-success-overlay" onclick="adoptCat(${cat.id})">
@@ -481,9 +485,13 @@ async function fetchCats(search = '') {
                      alt="${cat.name_cats}" 
                      onerror="this.src='https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w=600'">
                 <div class="cat-card-overlay">
-                    ${cat.adoption_status ? `
-                        <span class="adoption-badge-overlay adopted">
-                            <i class="fas fa-check-circle"></i> Déjà réservé
+                    ${cat.adoption_status === 'confirmed' ? `
+                        <span class="adoption-badge-overlay confirmed" style="background: rgba(16, 185, 129, 0.9); color: white;">
+                            <i class="fas fa-check-circle"></i> Adopté
+                        </span>
+                    ` : cat.adoption_status === 'pending' ? `
+                        <span class="adoption-badge-overlay pending" style="background: rgba(245, 158, 11, 0.9); color: white;">
+                            <i class="fas fa-clock"></i> Réservé
                         </span>
                     ` : `
                         <button class="btn-success-overlay" onclick="adoptCat(${cat.id})">

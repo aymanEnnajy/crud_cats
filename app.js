@@ -319,6 +319,40 @@ export default {
     }
 
     // -----------------------
+    // ROUTE PUT /api/adoptions/:cat_id/status
+    // -----------------------
+    if (url.pathname.startsWith("/api/adoptions/") && url.pathname.endsWith("/status") && method === "PUT") {
+      try {
+        const parts = url.pathname.split("/");
+        const catId = parts[parts.length - 2];
+        const body = await request.json();
+        const { status } = body;
+
+        const authHeader = request.headers.get("Authorization");
+        if (!authHeader) return new Response(JSON.stringify({ error: "Non autorisé" }), { status: 401 });
+        const token = authHeader.split(' ')[1];
+        const userId = token.split('-')[2];
+
+        // Vérifier que l'adoption appartient à l'utilisateur
+        const { results: adoption } = await env.DB.prepare("SELECT * FROM adoptions WHERE cat_id = ? AND user_id = ?")
+          .bind(catId, userId).all();
+
+        if (adoption.length === 0) {
+          return new Response(JSON.stringify({ error: "Adoption non trouvée" }), { status: 404 });
+        }
+
+        await env.DB.prepare("UPDATE adoptions SET status = ? WHERE cat_id = ? AND user_id = ?")
+          .bind(status, catId, userId).run();
+
+        return new Response(JSON.stringify({ success: true, message: "Statut de l'adoption mis à jour" }), {
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+      }
+    }
+
+    // -----------------------
     // ROUTE par défaut
     // -----------------------
     // -----------------------
