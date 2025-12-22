@@ -53,12 +53,14 @@ export default {
         const body = await request.json();
         const { name_cats, tag, description, images } = body;
 
+        console.log("Attempting to insert cat:", { userId, name_cats, tag, description, images });
         const { lastInsertRowid } = await env.DB
           .prepare(
             "INSERT INTO cats (id_user, name_cats, tag, description, images, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
           )
           .bind(userId, name_cats, tag, description, images)
           .run();
+        console.log("Cat inserted with rowid:", lastInsertRowid);
 
         const { results } = await env.DB.prepare("SELECT * FROM cats WHERE id=?").bind(lastInsertRowid).all();
 
@@ -144,11 +146,12 @@ export default {
           return new Response(JSON.stringify({ error: "Nom d'utilisateur ou email déjà utilisé" }), { status: 400 });
         }
 
+        console.log("Attempting to register user:", { username, email });
         const { lastInsertRowid } = await env.DB
           .prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)")
           .bind(username, email, password)
           .run();
-
+        console.log("User registered with rowid:", lastInsertRowid);
         const sessionId = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
