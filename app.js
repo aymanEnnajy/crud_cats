@@ -17,16 +17,33 @@ export default {
 
       try {
         const { results } = await env.DB.prepare(
-          "SELECT user_id FROM user_sessions WHERE id = ? AND expires_at > CURRENT_TIMESTAMP"
+          "SELECT user_id FROM user_sessions WHERE id = ? AND expires_at > datetime('now')"
         ).bind(sessionId).all();
 
         if (results.length === 0) return null;
         return results[0].user_id;
       } catch (e) {
-        console.error("Error in getSession (maybe table missing?):", e.message);
+        console.error("Error in getSession:", e.message);
         return null;
       }
     };
+
+    // -----------------------
+    // DIAGNOSTIC ROUTE
+    // -----------------------
+    if (url.pathname === "/api/diag" && method === "GET") {
+      try {
+        const { results: tables } = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+        const info = {};
+        for (const t of tables) {
+          const { results: cols } = await env.DB.prepare(`PRAGMA table_info(${t.name})`).all();
+          info[t.name] = cols;
+        }
+        return new Response(JSON.stringify({ tables: info }), { headers: { "Content-Type": "application/json" } });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+      }
+    }
 
     // -----------------------
     // ROUTE GET /api/cats
@@ -164,18 +181,24 @@ export default {
 
         const sessionId = crypto.randomUUID();
 
-        // Supprimer les anciennes sessions
         try {
+          // Use INSERT OR REPLACE if existing session for user? 
+          // Actually, we want one session per user, but id is the primary key and it's a UUID.
+          // So we delete old ones first.
           await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(newUserId).run();
-        } catch (e) {
-          console.error("Failed to delete old sessions:", e.message);
-        }
 
-        console.log("Attempting to insert session for user:", newUserId);
-        await env.DB.prepare(
-          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
-        ).bind(sessionId, newUserId).run();
-        console.log("Session inserted successfully");
+          await env.DB.prepare(
+            "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
+          ).bind(sessionId, newUserId).run();
+          console.log("Session created for user", newUserId);
+        } catch (sessionErr) {
+          console.error("Session error:", sessionErr.message);
+          return new Response(JSON.stringify({
+            error: "Erreur session",
+            details: sessionErr.message,
+            userId: newUserId
+          }), { status: 500 });
+        }
 
         return new Response(
           JSON.stringify({
@@ -219,21 +242,27 @@ export default {
         const user = users[0];
         const sessionId = crypto.randomUUID();
 
-        // Supprimer les anciennes sessions
         try {
           await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(user.id).run();
-        } catch (e) {
-          console.error("Failed to delete old sessions in login:", e.message);
+
+          await env.DB.prepare(
+            "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
+          ).bind(sessionId, user.id).run();
+          console.log("Session created for login", user.id);
+        } catch (sessionErr) {
+          console.error("Session error login:", sessionErr.message);
+          return new Response(JSON.stringify({
+            error: "Erreur session",
+            details: sessionErr.message,
+            userId: user.id
+          }), { status: 500 });
         }
 
-        console.log("Attempting to insert session for user:", user.id);
-        await env.DB.prepare(
-          "INSERT INTO user_sessions (id, user_id, expires_at) VALUES (?, ?, datetime('now', '+30 days'))"
-        ).bind(sessionId, user.id).run();
-        console.log("Session inserted successfully for login");
-
         return new Response(
-          JSON.stringify({ message: "Connexion réussie", user: { id: user.id, username: user.username, email: user.email } }),
+          JSON.stringify({
+            message: "Connexion réussie",
+            user: { id: user.id, username: user.username, email: user.email }
+          }),
           {
             headers: {
               "Content-Type": "application/json",
